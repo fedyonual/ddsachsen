@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>德勒斯登 景點島</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3EDE2; --paper:#FBF8F2; --ink:#2A2931; --muted:#716B62; --line:#E2D8C6;
+  --sea:#D6E5E8; --land:#E9DDC7; --land2:#E3D5BB; --river:#6AA6BE; --accent:#D35A3A; --elbe:#2F6F8F;
+  --shadow:0 10px 30px rgba(60,45,20,.12);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--elbe)}
+
+/* header */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:18px 22px 10px;flex-wrap:wrap}
+.kicker{font-size:11px;letter-spacing:.22em;color:var(--elbe);font-weight:700}
+h1{font-family:"Noto Serif TC",serif;font-weight:900;font-size:clamp(26px,4.6vw,40px);margin:2px 0 0;letter-spacing:.04em}
+.tag{margin:2px 0 0;color:var(--muted);font-size:14px}
+.stats{display:flex;gap:18px}
+.stats div{display:flex;flex-direction:column;align-items:center}
+.stats b{font-family:"Noto Serif TC",serif;font-size:28px;line-height:1;color:var(--accent)}
+.stats span{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-top:4px}
+
+.views{display:flex;gap:6px;padding:0 22px 10px;overflow-x:auto}
+.views button{border:1px solid var(--line);background:var(--paper);padding:7px 14px;border-radius:999px;font-size:14px;white-space:nowrap}
+.views button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* map view */
+.mapLayout{display:grid;grid-template-columns:minmax(0,1fr);gap:0;padding:0 14px 14px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:6px 8px 10px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;max-width:100%;min-width:0;flex:1 1 auto;scrollbar-width:none}
+.toolbar{min-width:0}
+.chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 11px;font-size:13px;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--c);display:inline-block}
+.chip.on{background:var(--c);color:#fff;border-color:var(--c)}
+.chip.on i{background:#fff}
+.chip.all.on{background:var(--ink);border-color:var(--ink)}
+.toggles{display:flex;gap:6px;flex-wrap:wrap}
+.tg{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:5px 10px;font-size:13px}
+.tg.on{border-color:var(--elbe);color:var(--elbe);background:#E6F0F3;font-weight:500}
+
+.stage{position:relative;height:min(72vh,720px);min-height:420px;border-radius:18px;overflow:hidden;background:var(--sea);box-shadow:var(--shadow);perspective:1400px}
+.tiltWrap{width:100%;height:100%;transition:transform .7s cubic-bezier(.2,.8,.2,1);transform-origin:50% 55%}
+.tiltWrap.tilt{transform:rotateX(38deg) scale(1.08)}
+#map{width:100%;height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none}
+.zoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.zoom button{width:36px;height:36px;padding:0;white-space:nowrap;border-radius:10px;border:1px solid var(--line);background:rgba(251,248,242,.94);font-size:18px;line-height:1}
+.legend{position:absolute;left:10px;bottom:10px;background:rgba(251,248,242,.94);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:11.5px;display:flex;flex-direction:column;gap:3px}
+.legend div{display:flex;align-items:center;gap:7px}
+.legend.hide{display:none}
+@media (max-width:600px){.legend{display:none}.legend.show{display:flex}}
+.legend svg{flex:none}
+.mascot{position:absolute;left:10px;top:10px;background:rgba(251,248,242,.94);border:1px solid var(--line);border-radius:12px;padding:7px 11px;font-size:13px;max-width:230px;line-height:1.45}
+.mascot b{color:var(--elbe)}
+.note{font-size:11.5px;color:var(--muted);padding:8px 8px 0}
+
+/* svg styles */
+.cell{cursor:pointer}
+.cell .lift{transition:transform .2s ease, opacity .25s}
+.cell:hover .lift{transform:translateY(-4px)}
+.cell.sel .lift{transform:translateY(-6px)}
+.cell .top{stroke-width:1.6;transition:stroke-width .2s}
+.cell.sel .top{stroke-width:4}
+.cell.dim .lift{opacity:.16}
+.cell .ico{font-size:17px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.cell .lab{font-size:9.6px;font-weight:700;text-anchor:middle;fill:#2A2931;paint-order:stroke;stroke:rgba(255,255,255,.85);stroke-width:2.6px;pointer-events:none}
+.cell .lab2{font-size:7.2px;font-weight:500;text-anchor:middle;fill:#57524A;paint-order:stroke;stroke:rgba(255,255,255,.85);stroke-width:2.2px;pointer-events:none}
+.nolabels .cell .lab,.nolabels .cell .lab2{display:none}
+.nolabels .cell .ico{transform:translateY(9px)}
+.cell .favdot{display:none}
+.cell.fav .favdot{display:block}
+.link{fill:none;stroke-linecap:round;transition:opacity .25s}
+.links.off{display:none}
+.link.faint{opacity:.12}
+.link.hi{opacity:1;stroke-width:5!important}
+.rg{pointer-events:none}
+.rg text{text-anchor:middle;font-family:"Noto Sans TC",system-ui,sans-serif}
+.rg-shadow{fill:rgba(40,30,15,.18)}
+.rg-de{font-weight:800;letter-spacing:.02em}
+.rg-zh{font-weight:500;letter-spacing:.12em}
+.rg-c .rg-box,.rg-c .rg-pin{fill:#2A2931}
+.rg-c .rg-dot{fill:#F2B48E}
+.rg-c .rg-de{fill:#fff}
+.rg-c .rg-zh{fill:#E4DCCB}
+.rg-d .rg-box{fill:rgba(255,253,248,.95);stroke:#2F6F8F;stroke-width:1.4}
+.rg-d .rg-de{fill:#1F4E66}
+.rg-d .rg-zh{fill:#4F6A75}
+.rg-l .rg-box{fill:rgba(235,243,225,.92);stroke:#6E8B4E;stroke-width:1.2;stroke-dasharray:4 3}
+.rg-l .rg-de{fill:#3E5A28;font-style:italic}
+.rg-l .rg-zh{fill:#5B7046}
+.noregions .regions{display:none}
+.region{font-family:"Noto Serif TC",serif;font-weight:900;font-size:15px;fill:#7E6E52;letter-spacing:.05em;paint-order:stroke;stroke:rgba(255,250,240,.7);stroke-width:3px;text-anchor:middle;pointer-events:none;opacity:.8}
+.region.sub{font-family:"Noto Sans TC",sans-serif;font-weight:500;font-size:9px;letter-spacing:.15em;opacity:.75}
+.riverlab{font-size:13px;fill:#fff;font-weight:700;letter-spacing:.5em;pointer-events:none}
+.ring{fill:none;stroke:var(--accent);stroke-width:3;animation:pulse 1.6s ease-out infinite;pointer-events:none}
+@keyframes pulse{0%{opacity:.9;transform:scale(.9)}100%{opacity:0;transform:scale(1.5)}}
+.route{fill:none;stroke:var(--accent);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:10 7;animation:dash 1.2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-34}}
+.badge circle{fill:var(--accent);stroke:#fff;stroke-width:2}
+.badge text{fill:#fff;font-size:10px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+.badge.future circle{fill:#B9AE9C}
+
+/* sheet */
+.sheet{position:fixed;z-index:30;background:var(--paper);box-shadow:0 -10px 40px rgba(40,30,10,.22);overflow-y:auto;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+@media (max-width:899px){
+  .sheet{left:0;right:0;bottom:0;max-height:58vh;border-radius:20px 20px 0 0;transform:translateY(105%)}
+  .sheet.open{transform:none}
+  .sheet::before{content:"";display:block;width:42px;height:4px;border-radius:4px;background:#D6CBB8;margin:8px auto 0}
+}
+@media (min-width:900px){
+  .sheet{top:16px;right:16px;bottom:16px;width:380px;border-radius:20px;transform:translateX(110%)}
+  .sheet.open{transform:none}
+}
+.sh{display:flex;gap:12px;align-items:flex-start;padding:16px 18px 10px;border-bottom:3px solid var(--c)}
+.sh .big{font-size:34px;width:56px;height:56px;border-radius:14px;background:var(--cl);display:flex;align-items:center;justify-content:center;flex:none}
+.sh .kick{font-size:11.5px;color:var(--c);font-weight:700;letter-spacing:.08em}
+.sh h2{font-family:"Noto Serif TC",serif;margin:2px 0 0;font-size:21px;line-height:1.3}
+.sh .de{font-size:13px;color:var(--muted);margin-top:2px}
+.sh .btns{margin-left:auto;display:flex;gap:6px}
+.sh .btns button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:15px}
+.sh .btns .favb.on{background:#FFF3D6;border-color:#E8B84A;color:#B8892B}
+.sb{padding:12px 18px 22px}
+.ph{margin:0;position:relative;background:#E9E1D2}
+.ph img{display:block;width:100%;height:220px;object-fit:cover}
+.ph figcaption{font-size:10.5px;color:#6F6A63;padding:5px 18px 0;line-height:1.5}
+.ph figcaption a{color:#6F6A63}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.facts div{background:#F3EDE2;border-radius:10px;padding:8px 10px;font-size:12.5px;line-height:1.45}
+.facts b{display:block;font-size:11px;color:var(--muted);font-weight:500}
+.sb p{line-height:1.75;font-size:14.5px;margin:0 0 12px}
+.sb h4{font-size:12px;letter-spacing:.12em;color:var(--muted);margin:14px 0 6px}
+.sb ul{margin:0;padding-left:18px;line-height:1.7;font-size:14px}
+.conn{display:flex;flex-wrap:wrap;gap:6px}
+.conn button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 10px;font-size:12.5px}
+.photolink{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border-radius:12px;background:var(--cl);text-decoration:none;color:var(--ink)}
+.photolink span:first-child{font-size:22px}
+.photolink b{display:block;font-size:14px}
+.photolink small{color:var(--muted);font-size:11.5px}
+.photolink span:last-child{margin-left:auto;color:var(--c);font-weight:700}
+.maplink{display:inline-block;margin-top:16px;font-size:13.5px;font-weight:500;text-decoration:none;border:1px solid var(--elbe);padding:7px 12px;border-radius:999px}
+.tourtag{display:inline-block;background:#FBE5DC;color:var(--accent);font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;margin-bottom:10px}
+
+/* list */
+.listWrap{padding:0 22px 40px;max-width:1200px}
+.listCtl{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.listCtl input{flex:1;min-width:180px;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:9px 12px;font-size:15px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--paper);padding:8px 12px;font-size:13px}
+.seg button.on{background:var(--ink);color:#fff}
+.grp h3{font-family:"Noto Serif TC",serif;font-size:18px;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+.grp h3 i{width:12px;height:12px;border-radius:3px;background:var(--c);display:inline-block}
+.grp h3 small{font-family:"Noto Sans TC";font-size:12px;color:var(--muted);font-weight:400}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.card{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:12px;padding:11px 12px;display:flex;gap:10px;text-align:left;align-items:flex-start;width:100%}
+.card .e{font-size:26px;line-height:1}
+.card .cth{width:56px;height:56px;border-radius:8px;object-fit:cover;flex:none}
+.card b{display:block;font-size:15px}
+.card small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.card .m{font-size:12px;margin-top:6px;color:#4E4A44}
+.card .st{margin-left:auto;color:#C9BFAE;font-size:16px}
+.card .st.on{color:#E0A526}
+.empty{color:var(--muted);padding:30px 0}
+
+/* tour */
+.tourLayout{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:0 14px 30px}
+@media (min-width:900px){.tourLayout{grid-template-columns:minmax(0,1fr) 400px}.tourLayout .stage{height:calc(100vh - 170px);min-height:520px}}
+@media (max-width:899px){.tourLayout .stage{height:46vh;min-height:300px}}
+.tourPanel{background:var(--paper);border-radius:18px;box-shadow:var(--shadow);padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.chapters{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.chapters button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 8px;text-align:left;font-size:13px;line-height:1.3}
+.chapters button b{display:block;font-family:"Noto Serif TC",serif;color:var(--accent);font-size:12px}
+.chapters button.on{border-color:var(--accent);background:#FDF0EA}
+.chNote{font-size:12.5px;color:var(--muted);line-height:1.6;background:#F3EDE2;border-radius:10px;padding:8px 10px}
+.stepCard{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff}
+.stepTop{display:flex;align-items:baseline;gap:10px}
+.stepTop .t{font-family:"Noto Serif TC",serif;font-size:30px;font-weight:900;color:var(--accent);line-height:1}
+.stepTop .n{font-size:12px;color:var(--muted);margin-left:auto}
+.stepCard h3{margin:6px 0 4px;font-size:17px}
+.stepCard p{margin:0;line-height:1.7;font-size:14px}
+.stepCard .mv{margin-top:8px;font-size:12.5px;color:var(--elbe)}
+.stepCard .more{margin-top:8px;border:0;background:none;color:var(--accent);font-weight:700;padding:0;font-size:13px}
+.scrub{position:relative;padding:6px 4px 0}
+.track{position:relative;height:8px;border-radius:8px;background:#E7DECF}
+.fill{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:linear-gradient(90deg,#F2B48E,var(--accent));transition:width .4s}
+.mk{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:2px solid #fff;background:#B9AE9C;padding:0}
+.mk.done{background:var(--accent)}
+.mk.cur{width:18px;height:18px;margin:-9px 0 0 -9px;background:var(--accent);box-shadow:0 0 0 4px rgba(211,90,58,.25)}
+.ticks{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:6px}
+.ctrl{display:flex;gap:8px}
+.ctrl button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 6px;font-size:14px}
+.ctrl button.pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+.stepList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;max-height:260px;overflow-y:auto}
+.stepList button{width:100%;border:0;background:none;text-align:left;padding:6px 8px;border-radius:8px;display:flex;gap:10px;font-size:13.5px}
+.stepList button span{font-variant-numeric:tabular-nums;color:var(--muted);width:42px;flex:none}
+.stepList button.on{background:#FDF0EA;font-weight:700}
+.stepList button.on span{color:var(--accent)}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(30,25,15,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.mbox{background:var(--paper);border-radius:20px;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;padding:20px 22px 24px;position:relative}
+.mbox h2{font-family:"Noto Serif TC",serif;margin:0 0 4px}
+.mbox h3{font-size:14px;color:var(--elbe);margin:18px 0 6px;letter-spacing:.06em}
+.mbox p,.mbox li{font-size:14px;line-height:1.75}
+.mbox ul{padding-left:18px;margin:0}
+.mbox .x{position:absolute;right:14px;top:14px;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff}
+.mbox .src a{word-break:break-all}
+@media (max-width:600px){.top{padding:14px 16px 8px}.views{padding:0 16px 8px}.mapLayout,.tourLayout{padding:0 8px 10px}.stage{height:62vh;border-radius:14px}.legend{font-size:10.5px;padding:6px 8px}.mascot{font-size:12px;max-width:190px}.stats b{font-size:22px}.listWrap{padding:0 14px 40px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <div class="kicker">ELBE VALLEY · DRESDEN</div>
+    <h1>德勒斯登 景點島</h1>
+    <p class="tag">一格一景，串起易北河谷</p>
+  </div>
+  <div class="stats">
+    <div><b id="stSpots">0</b><span>景點＋美食</span></div>
+    <div><b id="stLinks">0</b><span>串聯</span></div>
+    <div><b id="stTours">0</b><span>一日行程</span></div>
+  </div>
+</header>
+<nav class="views" id="views">
+  <button data-v="map" class="on">🗺 全景</button>
+  <button data-v="list">☰ 清單</button>
+  <button data-v="tour">◷ 行程</button>
+  <button data-v="info">？概況</button>
+</nav>
+
+<main>
+  <section id="mapView">
+    <div class="mapLayout">
+      <div class="toolbar">
+        <div class="chips" id="chips"></div>
+        <div class="toggles">
+          <button class="tg on" id="tgLabels">名牌</button>
+          <button class="tg on" id="tgRegions">地名</button>
+          <button class="tg on" id="tgLinks">串聯線</button>
+          <button class="tg on" id="tgTerrain">地形</button>
+          <button class="tg on" id="tgCover">地表</button>
+          <button class="tg" id="tgTilt">鳥瞰</button>
+          <button class="tg" id="tgFav">★ 收藏</button>
+        </div>
+      </div>
+      <div id="stageSlotMap"></div>
+      <div class="note">地圖為示意，非等比例；近郊景點距市區 15–60 分鐘車程，萊比錫、開姆尼茨、格爾利茨約 1–1.5 小時火車。地形依概略海拔誇張呈現，地表為概括示意。可拖曳、雙指或滾輪縮放。</div>
+    </div>
+  </section>
+
+  <section id="listView" hidden>
+    <div class="listWrap">
+      <div class="listCtl">
+        <input id="q" type="search" placeholder="搜尋景點、德文名稱或關鍵字（例如：史多倫、瓷器）">
+        <div class="seg" id="grpSeg"><button data-g="theme" class="on">依主題</button><button data-g="area">依區域</button></div>
+        <div class="seg"><button id="listFav">★ 只看收藏</button></div>
+      </div>
+      <div id="listBody"></div>
+    </div>
+  </section>
+
+  <section id="tourView" hidden>
+    <div class="tourLayout">
+      <div id="stageSlotTour"></div>
+      <div class="tourPanel">
+        <div class="chapters" id="chapters"></div>
+        <div class="chNote" id="chNote"></div>
+        <div class="stepCard" id="stepCard"></div>
+        <div class="scrub">
+          <div class="track" id="track"><div class="fill" id="fill"></div></div>
+          <div class="ticks"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+        </div>
+        <div class="ctrl">
+          <button id="prev">← 上一步</button>
+          <button id="play">▶ 自動</button>
+          <button id="next" class="pri">下一步 →</button>
+        </div>
+        <ol class="stepList" id="stepList"></ol>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- shared map stage (moved between views) -->
+<div class="stage" id="stage">
+  <div class="tiltWrap" id="tiltWrap"><svg id="map" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <div class="mascot" id="mascot">⛴ <b>小明輪</b>：點任何一格開始探索，或到「行程」讓我帶你走一天。</div>
+  <div class="zoom"><button id="zin" aria-label="放大">＋</button><button id="zout" aria-label="縮小">－</button><button id="zfit" aria-label="全島">⤢</button><button id="zleg" class="legbtn" aria-label="圖例" style="font-size:11px">圖例</button></div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<aside class="sheet" id="sheet" aria-live="polite"></aside>
+
+<div class="modal" id="modal" hidden>
+  <div class="mbox">
+    <button class="x" id="mclose" aria-label="關閉">✕</button>
+    <h2>城市概況</h2>
+    <p>薩克森邦首府，易北河由東南向西北穿城而過，巴洛克建築群讓它有「易北河畔的佛羅倫斯」之稱。1945 年 2 月空襲後老城幾乎全毀，今天看到的聖母教堂、王宮等多為戰後與兩德統一後重建。</p>
+    <h3>交通</h3>
+    <ul>
+      <li>市區以電車與公車（DVB）為主，老城核心景點步行即可串起。</li>
+      <li>近郊靠 S-Bahn S1：往西北到邁森、往東南到薩克森小瑞士（拉滕、國王岩），都沿著易北河走。</li>
+      <li>萊比錫：ICE／IC 約 1 小時出頭，區域列車約 1.5 小時；開姆尼茨：區域列車約 1 小時；格爾利茨：區域列車約 1.5 小時。Rakotzbrücke 大眾運輸不便，建議開車。</li>
+      <li>區域交通可用 VVO 日票，或德國全國通用的 Deutschlandticket；依停留天數比較划算程度。</li>
+      <li><b>注意：</b>卡羅拉橋（Carolabrücke）2024 年 9 月 11 日部分坍塌，2025 年 9 月已全數拆除，新橋預計 2031 年前後完工；原本經過的電車路線已改道，查路線請以 DVB 官方資訊為準。</li>
+    </ul>
+    <h3>季節提醒</h3>
+    <ul>
+      <li>2026 年聖誕市集（Striezelmarkt）：11/25–12/24，舊市集廣場；12/24 只開到下午 2 點。</li>
+      <li>冬季明輪遊船、大花園小火車班次少或停駛；11–2 月日落約下午 4 點多，傍晚行程要提早。</li>
+      <li>夏季新城河岸有露天電影與音樂活動；9 月底拉德博伊爾、邁森有秋季葡萄酒節。</li>
+    </ul>
+    <h3>使用方式</h3>
+    <ul>
+      <li>點格子看介紹；上方主題可多選篩選。</li>
+      <li>「名牌」顯示名稱、「串聯線」顯示步行／電車／遊船／S-Bahn／火車等連結、「鳥瞰」切換傾斜視角。</li>
+      <li>「地形」依各地概略海拔把格子墊高：易北河谷與萊比錫平原最低（約 110 公尺），薩克森小瑞士的砂岩台地約 300–400 公尺，往南的厄爾士山越來越高。高度有放大，搭配「鳥瞰」最有立體感。</li>
+      <li>「地表」把每一格標成城市、農田、草地、森林、葡萄園、砂岩或湖泊：例如德勒斯登北邊的 Dresdner Heide 森林、易北河北岸的葡萄園坡地、薩克森小瑞士的砂岩柱、萊比錫南邊由礦坑改造的新湖區、莫里茨堡周邊的池塘。這是依一般地理知識概括繪製，不是衛星或土地利用圖資。</li>
+      <li>介紹卡右上角 ☆ 可收藏（存在這台裝置的瀏覽器裡）。</li>
+      <li>「行程」有 7 條一日路線，可逐步或自動播放，地圖會同步畫出路線。</li>
+    </ul>
+    <h3>照片</h3>
+    <p>景點照片取自 Wikimedia Commons，各張作者與授權（多為 CC BY / CC BY-SA 或公有領域）標示在照片下方，點擊可看原始頁面。照片只作為示意，內容可能與現況不同。</p>
+    <h3>資料說明</h3>
+    <p>整理於 2026 年 10 月 31 日。開放時間、票價、步道與纜車營運狀態經常變動，出發前請以各景點官網為準。</p>
+    <div class="src"><p>參考：
+      <a href="https://www.dresden.de/de/tourismus/sehen/weihnachtszeit/striezelmarkt.php" target="_blank" rel="noopener">德勒斯登市府・Striezelmarkt</a>｜
+      <a href="https://www.dresden.de/de/stadtraum/zentrale-projekte/carolabruecke.php" target="_blank" rel="noopener">德勒斯登市府・卡羅拉橋</a>｜
+      <a href="https://www.saechsische-schweiz.de/ausflugsziele/bastei" target="_blank" rel="noopener">薩克森小瑞士觀光局・巴斯泰</a>
+    </p></div>
+  </div>
+</div>
+
+<script src="photos/credits.js"></script>
+<script>
+/* ============ DATA ============ */
+const THEMES = {
+  palace:{n:'宮殿城堡',c:'#B8892B'},
+  landmark:{n:'地標建築',c:'#3D5A80'},
+  museum:{n:'藝術博物館',c:'#7B5EA7'},
+  nature:{n:'河岸自然',c:'#3F8F5F'},
+  town:{n:'近郊小鎮',c:'#A0623A'},
+  food:{n:'在地美食',c:'#D35A3A'},
+  season:{n:'季節限定',c:'#B83A6B'},
+  tech:{n:'科技與大學',c:'#1F8A8A'},
+  hub:{n:'交通樞紐',c:'#5B5B66'}
+};
+const AREAS = ['北側科技園區','老城','新城','易北河東岸','南側市區','西北近郊','薩克森小瑞士','萊比錫','開姆尼茨','格爾利茨','上盧薩蒂亞'];
+const MODES = {
+  walk:{n:'步行',i:'🚶',c:'#8A7F70',d:'1 7',w:3},
+  tram:{n:'電車／公車',i:'🚋',c:'#3D5A80',d:'8 6',w:3},
+  boat:{n:'明輪遊船',i:'⛴',c:'#2F86A6',d:'14 7',w:4},
+  sbahn:{n:'S-Bahn',i:'🚆',c:'#4E7A3A',d:'',w:3.4},
+  steam:{n:'窄軌蒸汽小火車',i:'🚂',c:'#B03A2E',d:'4 4',w:3.4},
+  rail:{n:'火車（ICE／區域）',i:'🚄',c:'#2A2931',d:'12 4 2 4',w:3.2},
+  car:{n:'開車',i:'🚗',c:'#8C6A3F',d:'3 5 9 5',w:3.2}
+};
+
+const SPOTS = [
+ // 老城
+ {id:'frauenkirche',ds:'Frauenkirche',t:'landmark',a:'老城',p:[7,6],e:'⛪',n:'聖母教堂',de:'Frauenkirche',s:'聖母教堂',stay:'1–1.5 小時',go:'老城中心',
+  d:'1743 年完工的巴洛克新教教堂，1945 年空襲後成為廢墟近半世紀；兩德統一後以原有石塊「拼圖式」重建，2005 年重新祝聖。外牆深色舊石與淺色新石交錯，是這座城市重生的象徵。',
+  tips:['教堂本身免費參觀，有禮拜或音樂會時會暫停開放','可付費登上圓頂觀景台，俯瞰新市集廣場與易北河','晚上常有管風琴與合唱音樂會，可先上官網看節目']},
+ {id:'zwinger',ds:'Zwinger',t:'palace',a:'老城',p:[4,5],e:'🏛️',n:'茨溫格宮',de:'Zwinger',s:'茨溫格宮',stay:'2–3 小時',go:'老城步行',
+  d:'強者奧古斯特下令興建的巴洛克宮苑，原為慶典與展示收藏的場所。中庭免費開放，周圍館舍收藏了歷代大師畫廊（拉斐爾《西斯汀聖母》就在這裡）、瓷器收藏館與數理沙龍。',
+  tips:['中庭與城牆步道免費，可先走一圈再決定買哪些館','大師畫廊、瓷器館都屬德勒斯登國家藝術收藏（SKD），可考慮多館聯票','王冠門（Kronentor）是最經典的拍照點']},
+ {id:'semperoper',ds:'Semperoper',t:'landmark',a:'老城',p:[5,5],e:'🎭',n:'森帕歌劇院',de:'Semperoper',s:'森帕歌劇院',stay:'1 小時（看演出另計）',go:'老城步行',
+  d:'薩克森國家歌劇院，建築師森帕（Gottfried Semper）設計，現今建築 1878 年完成，二戰後於 1985 年重建開幕。華格納、理查・史特勞斯多部作品在此首演。',
+  tips:['沒看演出也能參加白天的建築導覽，場次依演出排程而定','演出當天常有剩餘票或便宜的視線受限座，可現場詢問','劇院前的劇院廣場晚上打燈很美']},
+ {id:'schloss',ds:'Residenzschloss',t:'palace',a:'老城',p:[6,5],e:'👑',n:'王宮・綠穹珍寶館',de:'Residenzschloss · Grünes Gewölbe',s:'王宮',stay:'2–3 小時',go:'老城步行',
+  d:'薩克森君主的王宮，內有歐洲最豐富的珍寶館之一「綠穹珍寶館」：歷史綠穹保留巴洛克展廳原貌，新綠穹則逐件展示精工珍寶。另有土耳其廳、武器廳與王宮塔樓。',
+  tips:['「歷史綠穹」採限定時段入場，旺季請提早上網預約','王宮塔樓（Hausmannsturm）可登高看老城屋頂','展廳安檢較嚴，大包包需寄物']},
+ {id:'fuerstenzug',ds:'Fürstenzug',t:'landmark',a:'老城',p:[6,6],e:'🐎',n:'君王出巡圖',de:'Fürstenzug',s:'君王出巡圖',stay:'15–20 分鐘',go:'老城步行',
+  d:'長約 102 公尺的壁畫，由約 23,000 片邁森瓷磚拼成，描繪 800 多年來韋廷家族歷代統治者騎馬出巡的行列，而且奇蹟似地躲過了 1945 年的轟炸。',
+  tips:['位在王宮馬廄外牆的奧古斯都街上，免費','下午光線打在瓷磚上最漂亮','從聖母教堂走過來不到 3 分鐘']},
+ {id:'bruehl',ds:'Brühlsche Terrasse',t:'nature',a:'老城',p:[7,5],e:'🌅',n:'布呂爾平台',de:'Brühlsche Terrasse',s:'布呂爾平台',stay:'30–45 分鐘',go:'老城步行',
+  d:'沿著易北河岸、建在舊城牆上的高台步道，有「歐洲陽台」之稱。一側是藝術學院的玻璃圓頂（當地人戲稱「檸檬榨汁機」），一側俯瞰河上的明輪遊船。',
+  tips:['平台下方的露台岸（Terrassenufer）就是遊船碼頭','傍晚散步最舒服','平台底下有舊城防要塞遺跡（Festung Dresden）可付費參觀']},
+ {id:'albertinum',ds:'Albertinum',t:'museum',a:'老城',p:[8,5],e:'🖼️',n:'阿爾貝提努姆（新大師畫廊）',de:'Albertinum',s:'新大師畫廊',stay:'1.5–2 小時',go:'老城步行',
+  d:'位在布呂爾平台旁，收藏 19 世紀浪漫主義至今的作品，包括德國浪漫派畫家弗里德里希（Caspar David Friedrich）的風景畫，以及德勒斯登出身的里希特（Gerhard Richter）專室。',
+  tips:['想先認識薩克森小瑞士的「畫中風景」，可先來看弗里德里希','與茨溫格宮同屬 SKD，可用聯票']},
+ {id:'altmarkt',ds:'Striezelmarkt',t:'season',a:'老城',p:[6,7],e:'🎄',n:'舊市集廣場・聖誕市集',de:'Altmarkt · Striezelmarkt',s:'聖誕市集',stay:'1–2 小時',go:'老城中心',
+  d:'德勒斯登最古老的市集廣場。每年冬天舉辦德國有紀錄以來最古老的聖誕市集 Striezelmarkt（始於 1434 年），2026 年是第 592 屆，期間為 11/25–12/24。其他季節則是一般廣場與購物商圈。',
+  tips:['2026 年市集每日約 10:00–21:00，12/24 只開到下午 2 點','12/5（將臨期第二個週六）有史多倫節，巨型史多倫遊行','廣場上有約 14.6 公尺高、可走進去的厄爾士山階梯式聖誕塔']},
+ {id:'kreutzkamm',ds:'Kreutzkamm',t:'food',a:'老城',p:[5,7],e:'🍞',n:'克羅伊茨卡姆甜點店',de:'Konditorei Kreutzkamm',s:'史多倫老店',stay:'30 分鐘',go:'老城步行',
+  d:'1825 年創立的老牌糕點店，以德勒斯登聖誕史多倫（Dresdner Christstollen）聞名。正宗的「德勒斯登史多倫」受產地標章保護，只有當地認證烘焙坊能使用這個名稱。',
+  tips:['史多倫在 11–12 月口味最齊全，也能寄送','平常也吃得到薩克森的奶蛋起司蛋糕（Eierschecke）']},
+ {id:'sophienkeller',ds:'Sophienkeller',t:'food',a:'老城',p:[5,6],e:'🍖',n:'索菲地窖餐廳',de:'Sophienkeller im Taschenbergpalais',s:'索菲地窖',stay:'1.5 小時',go:'老城步行',
+  d:'位在塔申貝格宮地下、以奧古斯特時代為主題的地窖餐廳，主打薩克森傳統菜：醋燜牛肉（Sauerbraten）配紫高麗菜與馬鈴薯丸子；甜點可試奶渣煎餅（Quarkkeulchen）。',
+  tips:['觀光客多，但菜色具代表性，適合第一次吃薩克森菜','聖母教堂旁的 Pulverturm 也是類似風格的老牌地窖餐廳']},
+ {id:'hbf',ds:'Dresden Hbf',t:'hub',a:'老城',p:[6,8],e:'🚉',n:'德勒斯登中央車站',de:'Dresden Hauptbahnhof',s:'中央車站',stay:'—',go:'步行到舊市集廣場約 15 分鐘',
+  d:'S-Bahn S1 往邁森（西北）與薩克森小瑞士（東南）都從這裡出發，長途列車可往柏林、萊比錫與布拉格。車站大廳的膜結構屋頂由英國建築師諾曼・佛斯特改建。',
+  tips:['S1 大約每 30 分鐘一班，近郊一日遊很方便','大件行李可寄放車站置物櫃']},
+ // 新城
+ {id:'canaletto',ds:'Canaletto-Blick',t:'nature',a:'新城',p:[5,3],e:'📷',n:'卡納萊托視角',de:'Canaletto-Blick · Königsufer',s:'卡納萊托視角',stay:'30 分鐘',go:'過奧古斯都橋步行 10 分鐘',
+  d:'18 世紀畫家貝洛托（Bernardo Bellotto，人稱卡納萊托）曾從新城側河岸畫下老城全景。今天站在奧古斯都橋旁的易北河草地上，仍能看到幾乎一樣的天際線。',
+  tips:['藍調時刻（日落後 20–30 分鐘）最好拍','夏天這段河岸有露天電影與音樂活動（Filmnächte am Elbufer）']},
+ {id:'reiter',ds:'Goldener Reiter',t:'landmark',a:'新城',p:[6,3],e:'🏇',n:'金色騎士像',de:'Goldener Reiter',s:'金色騎士',stay:'15 分鐘',go:'過奧古斯都橋步行 10 分鐘',
+  d:'強者奧古斯特（薩克森選帝侯兼波蘭國王）的鍍金騎馬像，面朝老城，立在新城市集廣場上，也是新城主街（Hauptstraße）林蔭步道的起點。',
+  tips:['沿主街往北走，可以一路逛到新城的藝術區','奧古斯都橋上回望老城天際線很好拍']},
+ {id:'markthalle',ds:'Markthalle',t:'food',a:'新城',p:[7,3],e:'🧺',n:'新城市集館',de:'Neustädter Markthalle',s:'新城市集館',stay:'30–45 分鐘',go:'新城步行',
+  d:'1899 年落成的鑄鐵磚造市集館，裡面有生鮮、熟食攤、在地小吃與雜貨，是在新城吃早午餐或午餐的輕鬆選擇。',
+  tips:['週日多數攤位公休','可順便買薩克森特產當伴手禮']},
+ {id:'kunsthof',ds:'Kunsthofpassage',t:'museum',a:'新城',p:[8,3],e:'🎨',n:'藝術庭院通道',de:'Kunsthofpassage',s:'藝術庭院',stay:'45 分鐘–1 小時',go:'電車約 10 分鐘',
+  d:'外新城（Äußere Neustadt）的一連串彩繪庭院，每座各有主題。最有名的「元素之庭」外牆裝滿排水管與漏斗，下雨時會「演奏」出水流音樂。周邊滿是小店、二手店與街頭塗鴉。',
+  tips:['免費開放，白天店家營業時最有氣氛','下雨天反而最值得去看排水管牆','周邊 Alaunstraße 一帶酒吧多，晚上很熱鬧']},
+ {id:'pfunds',ds:'Pfunds Molkerei',t:'food',a:'新城',p:[8,2],e:'🥛',n:'普豐德乳品店',de:'Pfunds Molkerei',s:'普豐德乳品店',stay:'20–30 分鐘',go:'電車約 10 分鐘',
+  d:'1880 年創立的乳品店，牆面與櫃台貼滿手繪彩磚，曾被金氏世界紀錄列為「全世界最美的乳品店」。可以買起司、喝鮮奶，樓上咖啡廳有乳製品料理。',
+  tips:['店內通常禁止拍照，請留意現場標示','樓上咖啡廳可吃到起司料理與牛奶甜點']},
+ {id:'mhm',ds:'Militärhist. Museum',t:'museum',a:'新城',p:[8,1],e:'🔺',n:'軍事歷史博物館',de:'Militärhistorisches Museum der Bundeswehr',s:'軍事史博物館',stay:'2 小時',go:'電車約 15 分鐘',
+  d:'舊兵工廠建築被建築師李伯斯金（Daniel Libeskind）以一道鋼與玻璃的楔形量體「劈開」，2011 年重新開幕。展覽以「人與暴力」為主軸，而不只是陳列武器。',
+  tips:['楔形頂端的觀景平台面向 1945 年轟炸的方向','展品有英文說明']},
+ {id:'watzke',ds:'Ballhaus Watzke',t:'food',a:'新城',p:[4,3],e:'🍺',n:'瓦茨克啤酒廳',de:'Ballhaus Watzke',s:'瓦茨克啤酒',stay:'1.5 小時',go:'電車約 15 分鐘',
+  d:'易北河畔老舞廳改建的自釀啤酒餐廳，喝得到現場釀造的皮爾森與季節啤酒，搭配薩克森家常菜；夏天的露天座位正對易北河。',
+  tips:['週末晚上建議訂位','可點小杯多試幾款']},
+ // 東岸
+ {id:'blaues',ds:'Blaues Wunder',t:'landmark',a:'易北河東岸',p:[10,4],e:'🌉',n:'藍色奇蹟橋',de:'Blaues Wunder · Loschwitzer Brücke',s:'藍色奇蹟橋',stay:'30–45 分鐘',go:'電車／公車約 20 分鐘',
+  d:'1893 年完工的鋼構橋，連接布拉塞維茨與洛施維茨。當年不設河中橋墩的跨河設計被視為「奇蹟」，加上藍色漆面而得名，二戰末期也幸運躲過被炸毀的命運。',
+  tips:['傍晚從布拉塞維茨側看夕陽與橋最美','橋的北端就是上山纜車站','兩岸都有易北河草地，適合散步']},
+ {id:'toscana',ds:'Café Toscana',t:'food',a:'易北河東岸',p:[10,5],e:'🍰',n:'托斯卡納咖啡館',de:'Café Toscana',s:'托斯卡納咖啡',stay:'45 分鐘',go:'藍色奇蹟橋南端',
+  d:'布拉塞維茨席勒廣場上的老牌咖啡館，就在藍色奇蹟橋橋頭，以薩克森三層蛋糕「奶蛋起司蛋糕」（Eierschecke）出名，窗邊座位看得到橋。',
+  tips:['下午茶時段常客滿','搭配過橋坐纜車的行程剛好']},
+ {id:'schwebebahn',ds:'Schwebebahn',t:'nature',a:'易北河東岸',p:[11,3],e:'🚡',n:'洛施維茨登山纜車',de:'Standseilbahn & Schwebebahn Loschwitz',s:'洛施維茨纜車',stay:'1 小時',go:'藍色奇蹟橋北端',
+  d:'藍色奇蹟橋旁有兩條百年登山鐵道：1895 年的纜索鐵路，以及 1901 年的懸吊式單軌鐵路（號稱世界最古老的懸吊式登山鐵路）。山上觀景點可遠眺整個易北河谷。',
+  tips:['兩條線近年曾輪流停駛整修，出發前請查 DVB 營運狀態','可以搭一條上山、散步下來，再搭另一條體驗']},
+ {id:'elbschloesser',ds:'Elbschlösser',t:'palace',a:'易北河東岸',p:[10,3],e:'🏰',n:'易北河三城堡',de:'Elbschlösser',s:'易北河三城堡',stay:'1–1.5 小時',go:'電車約 15 分鐘',
+  d:'19 世紀中期沿易北河北岸山坡興建的三座城堡：阿爾布雷希特堡、林格納堡與埃克堡。林格納堡的露台與葡萄園坡地可俯瞰河谷與老城方向。',
+  tips:['林格納堡（Lingnerschloss）露台可免費進入','夏天傍晚來喝一杯看夕陽']},
+ {id:'pillnitz',ds:'Schloss Pillnitz',t:'palace',a:'易北河東岸',p:[12,5],e:'🏯',n:'皮爾尼茨宮',de:'Schloss & Park Pillnitz',s:'皮爾尼茨宮',stay:'2–3 小時',go:'公車約 30 分鐘，或搭遊船',
+  d:'易北河畔的夏宮，建築融合巴洛克與「中國風」（Chinoiserie）的屋頂與彩繪。宮苑內有一株 18 世紀末種下、樹齡超過 230 年的山茶花，冬季以可移動的玻璃屋保護。',
+  tips:['山茶花大約 2–4 月開花','夏季可從露台岸搭明輪蒸汽船前往（逆流約 1.5–2 小時），回程改搭公車較快','面河的台階就是當年君王從船上登岸的碼頭']},
+ // 南側市區
+ {id:'grossergarten',ds:'Großer Garten',t:'nature',a:'南側市區',p:[8,7],e:'🌳',n:'大花園',de:'Großer Garten',s:'大花園',stay:'1–2 小時',go:'電車約 10 分鐘',
+  d:'老城東南方的巴洛克大公園，面積約 1.8 平方公里，中央有 17 世紀的夏宮（Palais im Großen Garten）。園內有動物園、植物園，以及由孩子協助營運的公園小火車。',
+  tips:['公園小火車（Parkeisenbahn）通常只在春季到秋季營運','租單車或慢跑都很適合']},
+ {id:'glaeserne',ds:'Gläserne Manufaktur',t:'museum',a:'南側市區',p:[7,7],e:'🚗',n:'玻璃工廠',de:'Gläserne Manufaktur',s:'玻璃工廠',stay:'1 小時',go:'電車約 10 分鐘',
+  d:'福斯汽車在大花園旁蓋的全玻璃車廠，過去可隔著玻璃看汽車組裝。量產結束後，場館轉型為結合研發與展示的空間。',
+  tips:['轉型期間開放內容與導覽可能調整，參觀前請先查官網','就在大花園西北角，可順路散步']},
+ {id:'panometer',ds:'Panometer',t:'museum',a:'南側市區',p:[9,8],e:'🌀',n:'全景館',de:'Panometer Dresden',s:'全景館',stay:'1–1.5 小時',go:'電車約 20 分鐘',
+  d:'由 19 世紀的舊瓦斯儲氣槽改建，展出藝術家阿西西（Yadegar Asisi）的 360° 巨幅全景畫，主題曾包括巴洛克時期的德勒斯登與 1945 年的轟炸。',
+  tips:['展出主題會輪替，出發前查官網目前展出內容','登上中央觀景塔不同高度看，感受差很多']},
+ // 西北近郊
+ {id:'radebeul',ds:'Radebeul',t:'town',a:'西北近郊',p:[2,3],e:'🍇',n:'拉德博伊爾',de:'Radebeul',s:'拉德博伊爾',stay:'半天',go:'S-Bahn 約 15 分鐘，或電車 4 號',
+  d:'德勒斯登西北方的葡萄酒小城，山坡上滿是葡萄園與別墅。德國冒險小說作家卡爾・麥（Karl May）的故居博物館就在這裡，也是窄軌蒸汽小火車 Lößnitzgrundbahn 的起點。',
+  tips:['9 月底有秋季葡萄酒與劇場節（Herbst- und Weinfest）','從 Radebeul Ost 搭小火車到莫里茨堡約半小時']},
+ {id:'wackerbarth',ds:'Schloss Wackerbarth',t:'food',a:'西北近郊',p:[1,3],e:'🥂',n:'瓦克巴特宮酒莊',de:'Schloss Wackerbarth',s:'瓦克巴特酒莊',stay:'1.5–2 小時',go:'S-Bahn＋電車約 30 分鐘',
+  d:'薩克森州立酒莊，在巴洛克宮殿與葡萄園坡地間釀造氣泡酒與白酒，提供導覽與品酒，號稱歐洲第一座「體驗式酒莊」。',
+  tips:['導覽品酒建議先上網預約','附設餐廳，可以配餐試飲']},
+ {id:'meissen',ds:'Meißen',t:'town',a:'西北近郊',p:[1,2],e:'🏺',n:'邁森',de:'Meißen · Albrechtsburg',s:'邁森',stay:'半天',go:'S-Bahn S1 約 35–40 分鐘',
+  d:'歐洲硬瓷的誕生地。山丘上的阿爾布雷希特堡是德國最早作為宮殿興建的城堡，1710 年起也是邁森瓷器最早的工坊所在；旁邊是哥德式大教堂，老城石板巷適合慢慢逛。',
+  tips:['邁森瓷器工坊（Erlebniswelt）可看師傅示範拉坯與彩繪','城堡、大教堂與老城集中在山丘上，步行即可','9 月底有葡萄酒節']},
+ {id:'fummel',ds:'Meißner Fummel',t:'food',a:'西北近郊',p:[0,1],e:'🥐',n:'邁森空心酥',de:'Meißner Fummel',s:'邁森空心酥',stay:'15 分鐘',go:'邁森老城',
+  d:'邁森特有的超薄空心酥餅，一碰就碎。傳說是為了考驗替選帝侯送信的信差騎馬夠不夠小心：抵達時酥餅若碎了，就代表他騎太快或喝了酒。',
+  tips:['邁森老城的糕點店與伴手禮店都買得到','非常容易碎，帶回台灣要小心包裝']},
+ {id:'moritzburg',ds:'Schloss Moritzburg',t:'palace',a:'西北近郊',p:[4,1],e:'🦌',n:'莫里茨堡',de:'Schloss Moritzburg',s:'莫里茨堡',stay:'2–3 小時',go:'公車約 30 分鐘',
+  d:'坐落在人工湖中央的黃白色巴洛克狩獵行宮，收藏大量鹿角與皮革壁飾。捷克經典童話電影《三顆榛果給灰姑娘》（Drei Haselnüsse für Aschenbrödel）曾在此取景。',
+  tips:['冬季常推出與這部電影相關的特展','附近的小雉雞城堡與小燈塔可一起散步','可從拉德博伊爾搭窄軌蒸汽小火車過來']},
+
+ // 萊比錫
+ {id:'leipzighbf',ds:'Leipzig Hbf',t:'hub',a:'萊比錫',p:[-4,0],e:'🚉',n:'萊比錫中央車站',de:'Leipzig Hauptbahnhof',s:'萊比錫車站',stay:'—',go:'從德勒斯登：ICE／IC 約 1 小時出頭，區域列車約 1.5 小時',
+  d:'以面積計是歐洲最大的火車站之一，挑高大廳下方是三層購物商場。出站往南步行幾分鐘就進入老城環狀大道。',
+  tips:['ICE／IC 較快但要買長途票；區域列車可用 Deutschlandticket','老城很小，下車後步行即可串起主要景點']},
+ {id:'leipzig',ds:'Markt Leipzig',t:'town',a:'萊比錫',p:[-5,1],e:'🏙️',n:'萊比錫老城',de:'Leipzig · Markt & Passagen',s:'萊比錫老城',stay:'一天',go:'萊比錫中央車站步行 5–10 分鐘',
+  d:'薩克森最大城，以書展、音樂與商貿聞名。老城環狀大道內有文藝復興風格的舊市政廳（現為城市歷史博物館），以及梅德勒拱廊等一連串百年購物拱廊；這裡也是 1989 年和平革命的起點。',
+  tips:['老城步行就能串起拱廊、教堂與市集廣場','晚上 Karl-Liebknecht-Straße（KarLi）一帶餐廳酒吧多','甜點可試萊比錫雲雀（Leipziger Lerche），杏仁膏內餡的小塔']},
+ {id:'nikolai',ds:'Nikolaikirche',t:'landmark',a:'萊比錫',p:[-4,1],e:'🕯️',n:'尼古拉教堂',de:'Nikolaikirche Leipzig',s:'尼古拉教堂',stay:'30–45 分鐘',go:'萊比錫老城步行',
+  d:'1980 年代每週一在這裡舉行和平祈禱；1989 年 10 月 9 日約 7 萬人從周邊和平遊行，成為柏林圍牆倒塌前的關鍵一夜。教堂內部白色與淡綠的古典主義裝飾、棕櫚造型的柱子很特別。',
+  tips:['教堂前廣場有一根棕櫚柱複製品紀念 1989 年','至今仍有週一傍晚的和平祈禱']},
+ {id:'thomas',ds:'Thomaskirche',t:'landmark',a:'萊比錫',p:[-6,1],e:'🎼',n:'聖湯瑪斯教堂',de:'Thomaskirche',s:'湯瑪斯教堂',stay:'45 分鐘–1 小時',go:'萊比錫老城步行',
+  d:'巴哈 1723–1750 年在這裡擔任樂長，長眠於祭壇前。湯瑪斯少年合唱團（Thomanerchor）創立於 1212 年，是德國最古老的合唱團之一。',
+  tips:['週五傍晚、週六下午常有合唱團的經文歌演出（Motette），出發前查時間','對面就是巴哈博物館']},
+ {id:'auerbach',ds:'Auerbachs Keller',t:'food',a:'萊比錫',p:[-5,2],e:'🍷',n:'奧爾巴赫地窖',de:'Auerbachs Keller · Mädlerpassage',s:'浮士德地窖',stay:'1.5 小時',go:'萊比錫老城步行',
+  d:'位在梅德勒拱廊地下、近 500 年歷史的老餐廳。歌德學生時代常來這裡，《浮士德》裡魔鬼梅菲斯特帶浮士德喝酒的場景就設在這座地窖。',
+  tips:['拱廊入口有浮士德與梅菲斯特的銅像，據說摸他們的鞋會帶來好運','用餐時段建議先訂位']},
+ {id:'voelker',ds:'Völkerschlachtdenkmal',t:'landmark',a:'萊比錫',p:[-4,3],e:'🗿',n:'民族大會戰紀念碑',de:'Völkerschlachtdenkmal',s:'民族大會戰碑',stay:'1.5–2 小時',go:'萊比錫老城搭電車約 15–20 分鐘',
+  d:'紀念 1813 年聯軍擊敗拿破崙的萊比錫戰役，1913 年落成，高 91 公尺，是歐洲最大的紀念建築之一。內部有巨大的石雕守護者與穹頂，音響效果驚人。',
+  tips:['可爬約 500 階到頂端觀景台，中段有電梯','前方的倒影池適合拍全景','冬季關門時間較早']},
+ {id:'spinnerei',ds:'Spinnerei',t:'museum',a:'萊比錫',p:[-7,2],e:'🏭',n:'棉紡廠藝術區',de:'Spinnerei Leipzig',s:'棉紡廠藝術區',stay:'1.5–2 小時',go:'萊比錫老城搭電車約 20 分鐘',
+  d:'19 世紀歐洲規模最大的棉紡廠之一，如今是十多間畫廊與上百間藝術家工作室的園區，也是「新萊比錫畫派」的大本營。',
+  tips:['多數畫廊週日、週一休館','每年有幾次全園區開放日（Rundgang），氣氛最熱鬧']},
+ // 開姆尼茨
+ {id:'chemnitzhbf',ds:'Chemnitz Hbf',t:'hub',a:'開姆尼茨',p:[-3,6],e:'🚉',n:'開姆尼茨中央車站',de:'Chemnitz Hauptbahnhof',s:'開姆尼茨車站',stay:'—',go:'從德勒斯登：區域列車約 1 小時',
+  d:'開姆尼茨的鐵路樞紐，往德勒斯登、萊比錫與厄爾士山區的區域列車都在這裡發車。2025 年開姆尼茨是歐洲文化之都，市內留下不少公共藝術。',
+  tips:['往德勒斯登的區域列車可用 Deutschlandticket','市中心景點步行或電車即可串起']},
+ {id:'marx',ds:'Karl-Marx-Monument',t:'landmark',a:'開姆尼茨',p:[-3,7],e:'🧔',n:'卡爾・馬克思頭像',de:'Karl-Marx-Monument',s:'馬克思頭像',stay:'20 分鐘',go:'開姆尼茨車站步行約 10 分鐘',
+  d:'1971 年落成的巨型青銅頭像，頭部約 7 公尺高、連基座約 13 公尺，當地人暱稱「Nischel」（腦袋）。開姆尼茨在東德時期（1953–1990）曾改名為「卡爾・馬克思城」。',
+  tips:['後方牆上用德、英、法、俄四種語言寫著「全世界無產者，聯合起來！」','傍晚打燈後很有氣氛']},
+ {id:'tietz',ds:'Versteinerter Wald',t:'nature',a:'開姆尼茨',p:[-4,7],e:'🪵',n:'石化森林',de:'Versteinerter Wald · DAStietz',s:'石化森林',stay:'45 分鐘–1 小時',go:'市中心步行',
+  d:'約 2.9 億年前被火山爆發瞬間掩埋的森林化石。部分巨大的矽化樹幹就立在 DAStietz 文化中心的中庭，樓上的自然史博物館有更多展示。',
+  tips:['中庭的樹幹化石可免費觀看','DAStietz 裡還有圖書館與成人教育中心，適合躲雨休息']},
+ {id:'smac',ds:'smac',t:'museum',a:'開姆尼茨',p:[-3,8],e:'🦴',n:'薩克森考古博物館',de:'smac – Staatliches Museum für Archäologie Chemnitz',s:'考古博物館',stay:'1.5–2 小時',go:'市中心步行',
+  d:'位在建築師孟德爾頌（Erich Mendelsohn）1930 年設計的前肖肯百貨，弧形的水平帶窗是德國現代主義建築經典。展覽從石器時代一路講到工業時代的薩克森。',
+  tips:['就算不進館，建築外觀也值得繞一圈','展覽有英文說明與語音導覽']},
+ {id:'industrie',ds:'Industriemuseum',t:'museum',a:'開姆尼茨',p:[-4,8],e:'⚙️',n:'薩克森工業博物館',de:'Sächsisches Industriemuseum Chemnitz',s:'工業博物館',stay:'1.5–2 小時',go:'市中心搭電車約 10 分鐘',
+  d:'開姆尼茨曾有「薩克森的曼徹斯特」之稱。博物館位在舊鑄造廠的廠房裡，展出紡織機、蒸汽機、工具機與汽車，常有機器實際運轉示範。',
+  tips:['對機械、汽車有興趣的人可以待很久','運轉示範時間可先查官網']},
+ {id:'augustusburg',ds:'Augustusburg',t:'palace',a:'開姆尼茨',p:[-1,8],e:'🏰',n:'奧古斯都堡',de:'Schloss Augustusburg',s:'奧古斯都堡',stay:'2–3 小時',go:'開姆尼茨搭區域列車＋纜索鐵路約 40 分鐘',
+  d:'建在海拔約 500 公尺山頂的文藝復興狩獵宮，被稱為「厄爾士山之冠」。城堡內有大型的機車博物館與馬車博物館，天氣好可遠眺厄爾士山。',
+  tips:['從 Erdmannsdorf/Augustusburg 站可搭百年纜索鐵路上山，班次不多請先查','夏季常有猛禽飛行表演','冬季開放時間較短']},
+
+ // 格爾利茨
+ {id:'goerlitzhbf',ds:'Görlitz Bf',t:'hub',a:'格爾利茨',p:[16,4],e:'🚉',n:'格爾利茨火車站',de:'Bahnhof Görlitz',s:'格爾利茨車站',stay:'—',go:'從德勒斯登：區域列車約 1.5 小時',
+  d:'德國最東邊的城市之一，與波蘭的 Zgorzelec 隔著尼斯河相望。車站步行約 15 分鐘到老城。',
+  tips:['區域列車可用 Deutschlandticket','往 Weißwasser（Rakotzbrücke 方向）的區域列車也從這裡發車']},
+ {id:'goerlitz',ds:'Altstadt Görlitz',t:'town',a:'格爾利茨',p:[17,3],e:'🏘️',n:'格爾利茨老城',de:'Görlitz · Altstadt & Untermarkt',s:'格爾利茨老城',stay:'半天–一天',go:'格爾利茨車站步行約 15 分鐘',
+  d:'二戰幾乎沒有受到轟炸，保留了從哥德、文藝復興、巴洛克到新藝術風格的大量文化資產建築，是德國保存最完整的老城之一。也因此成為熱門電影場景，被戲稱為「Görliwood」，《歡迎來到布達佩斯大飯店》等片都在這裡取景。',
+  tips:['市政廳塔樓（Rathausturm）可登高看老城屋頂','有「Görliwood」電影場景導覽','12 月下市集廣場（Untermarkt）有西里西亞聖誕市集']},
+ {id:'peters',ds:'Peterskirche',t:'landmark',a:'格爾利茨',p:[18,3],e:'☀️',n:'聖彼得與保羅教堂（太陽管風琴）',de:'Pfarrkirche St. Peter und Paul',s:'彼得教堂',stay:'45 分鐘',go:'老城步行',
+  d:'薩克森最大的晚期哥德式廳堂教堂，84 公尺高的雙塔是老城的天際線。教堂內的「太陽管風琴」（Sonnenorgel）由 Casparini 於 1703 年打造，外殼上有 17 個金色太陽，2006 年重建完成。',
+  tips:['管風琴示奏（Orgelpunkt）通常在週二、週四、週日中午 12 點，出發前再確認','冬季開放時間較短','夏季有晚間管風琴音樂會']},
+ {id:'bruecke',ds:'Altstadtbrücke',t:'landmark',a:'格爾利茨',p:[19,3],e:'🇵🇱',n:'老城橋（通往波蘭）',de:'Altstadtbrücke · Zgorzelec',s:'老城橋',stay:'30–45 分鐘',go:'老城步行',
+  d:'跨越尼斯河、連接德國格爾利茨與波蘭 Zgorzelec 的行人橋，2004 年在原址重建。走過去就到了波蘭，對岸河岸可以拍格爾利茨老城與彼得教堂的全景。',
+  tips:['申根區內沒有邊境檢查，但請隨身帶護照','對岸使用波蘭茲羅提，部分店家也收歐元或刷卡']},
+ {id:'warenhaus',ds:'Warenhaus',t:'landmark',a:'格爾利茨',p:[17,4],e:'🏬',n:'格爾利茨百貨公司',de:'Görlitzer Warenhaus',s:'百貨公司',stay:'15 分鐘（外觀）',go:'老城步行',
+  d:'1913 年開幕、帶新藝術元素的百貨公司，有挑高的玻璃天井，是《歡迎來到布達佩斯大飯店》大廳的取景地。2009 年停業後一直閒置，重新開幕的計畫多次延後。',
+  tips:['目前內部不開放，只能看外觀','旁邊就是 Marienplatz 與 Dicker Turm 塔樓']},
+ {id:'himmelreich',ds:'Schlesisches Himmelreich',t:'food',a:'格爾利茨',p:[18,4],e:'🥟',n:'西里西亞天堂（地方菜）',de:'Schlesisches Himmelreich',s:'西里西亞天堂',stay:'1 小時',go:'老城餐廳',
+  d:'格爾利茨所在的上盧薩蒂亞一帶歷史上屬於西里西亞。代表菜「西里西亞天堂」是燻豬肉配糖漬乾果（李子、杏桃）醬汁與麵粉或馬鈴薯丸子，鹹甜交織。',
+  tips:['老城的傳統餐廳多半吃得到','可以配在地的 Landskron 啤酒']},
+ // 上盧薩蒂亞
+ {id:'rakotz',ds:'Rakotzbrücke',t:'nature',a:'上盧薩蒂亞',p:[15,-1],e:'🌉',n:'惡魔橋（拉科茲橋）',de:'Rakotzbrücke · Kromlauer Park',s:'惡魔橋',stay:'1–1.5 小時',go:'從德勒斯登開車約 1.5 小時；從格爾利茨開車約 1 小時',
+  d:'克羅姆勞杜鵑花園（Kromlauer Park）湖上的玄武岩與田野石拱橋，19 世紀中後期興建，長約 35 公尺。橋身與水中倒影合成近乎完美的圓，所以被稱為「惡魔橋」（Teufelsbrücke），也曾出現在《駭客任務：復活》。2018–2021 年整修完成。',
+  tips:['為了保護古蹟，禁止走上橋，只能在湖邊觀賞','5 月杜鵑花盛開時最美；挑無風的日子倒影最完整','公園免費，停車場收費；大眾運輸可搭火車到 Weißwasser，再轉夏季的森林鐵路蒸汽火車','附近的 Bad Muskau 慕斯考公園是德波跨國的世界遺產，可以一起排']},
+
+ // 科技與大學
+ {id:'tud',ds:'TU Dresden',t:'tech',a:'南側市區',p:[7,8],e:'🎓',n:'德勒斯登工業大學',de:'Technische Universität Dresden',s:'德勒斯登工大',stay:'1–2 小時（校園散步）',go:'中央車站步行約 15 分鐘，或搭公車／電車',
+  d:'1828 年創立，是德國規模最大的工業大學之一，也是少數獲選為「卓越大學」（Exzellenzuniversität）的學校，約有 29,000 名學生。主校區在中央車站南邊的 Südvorstadt，與周邊的 Fraunhofer、Max Planck、Leibniz 等研究機構組成「DRESDEN-concept」研究聯盟，也是 Silicon Saxony 半導體產業的人才來源。',
+  tips:['校園開放，可以散步看新舊系館交錯','附近的薩克森州立暨大學圖書館（SLUB）開放一般民眾入內','學生餐廳通常也接待訪客，價格比學生價高']},
+ {id:'esmc',ds:'ESMC',t:'tech',a:'北側科技園區',p:[6,0],e:'🏭',n:'ESMC（台積電德國廠）',de:'European Semiconductor Manufacturing Company',s:'台積電德國廠',stay:'外觀（不開放參觀）',go:'市中心開車或搭公車約 25–30 分鐘',
+  d:'台積電在歐洲的第一座晶圓廠（集團內稱 Fab 24），台積電持股 70%，Bosch、Infineon、NXP 各持 10%，總投資約 100 億歐元，其中約一半來自政府補助。2024 年 8 月動土、2026 年 9 月舉行上樑典禮，預計 2027 年下半年開始量產，以 28/22 奈米與 16/12 奈米製程生產車用晶片；滿載時每月約 4 萬片 12 吋晶圓，預計創造約 2,000 個工作機會。',
+  tips:['廠區不對外開放，只能從周邊道路看外觀','位在德勒斯登機場附近、Bosch 晶圓廠旁的工業區','整個 Silicon Saxony 聚落目前有超過 8 萬人從事相關工作']},
+ {id:'infineon',ds:'Infineon Dresden',t:'tech',a:'北側科技園區',p:[7,0],e:'⚡',n:'英飛凌德勒斯登廠',de:'Infineon Technologies Dresden · Smart Power Fab',s:'英飛凌',stay:'外觀（不開放參觀）',go:'新城搭電車約 20 分鐘',
+  d:'英飛凌在德勒斯登北部的大型半導體廠區。新建的 Smart Power Fab 投資約 50 億歐元，是公司史上最大單筆投資，2026 年 7 月 2 日比原計畫提前數月啟用，讓德勒斯登廠區產能倍增，號稱全球最大的功率半導體與類比／混合訊號晶圓廠，產品主要用在電動車、充電設施、再生能源與資料中心。',
+  tips:['廠區不對外開放','新廠約 90% 用水回收再利用、最多可回收 45% 的能源，官方網站有綠色製造的介紹','英飛凌同時也是 ESMC 的股東之一']},
+ // 薩克森小瑞士
+ {id:'bastei',ds:'Bastei',t:'nature',a:'薩克森小瑞士',p:[12,8],e:'⛰️',n:'巴斯泰橋',de:'Bastei · Basteibrücke',s:'巴斯泰橋',stay:'半天',go:'S1 到 Kurort Rathen 約 35–40 分鐘，再渡河步行 30–45 分鐘',
+  d:'薩克森小瑞士國家公園最有名的砂岩奇景：1851 年建成、長 76.5 公尺的石橋橫跨約 40 公尺深的峽谷，連接嶙峋的砂岩柱。2023 年 2 月新的懸空觀景台啟用。',
+  tips:['免門票、全年全天開放；橋旁的新拉滕石堡遺址需少量門票','週末中午人潮多，早上去比較清靜','2026 年 7 月底暴風雨後，拉滕一帶有步道支線封閉，出發前請查國家公園公告']},
+ {id:'koenigstein',ds:'Festung Königstein',t:'palace',a:'薩克森小瑞士',p:[13,10],e:'🛡️',n:'柯尼希施泰因要塞（國王岩）',de:'Festung Königstein',s:'國王岩要塞',stay:'2–3 小時',go:'S1 約 40–45 分鐘，再搭接駁或步行上山',
+  d:'盤踞在易北河畔高約 240 公尺台地上的山頂要塞，是歐洲規模最大的山頂要塞之一，歷史上從未被攻破。要塞內有深約 152 公尺的古井、兵營與砲台，城牆步道視野極佳。',
+  tips:['可和巴斯泰橋排同一天：同一條 S1，拉滕下一站就是國王岩','山下到要塞有接駁小車，要塞邊還有觀景電梯，可省去爬坡']}
+];
+
+const LINKS = [
+ ['frauenkirche','fuerstenzug','walk'],['fuerstenzug','schloss','walk'],['schloss','zwinger','walk'],['zwinger','semperoper','walk'],
+ ['semperoper','bruehl','walk'],['bruehl','albertinum','walk'],['albertinum','frauenkirche','walk'],['frauenkirche','altmarkt','walk'],
+ ['altmarkt','kreutzkamm','walk'],['schloss','sophienkeller','walk'],['altmarkt','hbf','walk'],
+ ['semperoper','canaletto','walk'],['canaletto','reiter','walk'],['reiter','markthalle','walk'],['markthalle','kunsthof','walk'],['kunsthof','pfunds','walk'],
+ ['pfunds','mhm','tram'],['canaletto','watzke','tram'],['watzke','radebeul','tram'],['radebeul','wackerbarth','tram'],
+ ['altmarkt','grossergarten','tram'],['grossergarten','glaeserne','walk'],['grossergarten','panometer','tram'],
+ ['bruehl','blaues','boat'],['blaues','pillnitz','boat'],['blaues','toscana','walk'],['blaues','schwebebahn','walk'],['schwebebahn','elbschloesser','walk'],
+ ['meissen','fummel','walk'],['hbf','meissen','sbahn'],['hbf','bastei','sbahn'],['bastei','koenigstein','sbahn'],
+ ['radebeul','moritzburg','steam'],
+ ['hbf','leipzighbf','rail'],['hbf','chemnitzhbf','rail'],
+ ['leipzighbf','leipzig','walk'],['leipzighbf','nikolai','walk'],['leipzig','nikolai','walk'],['leipzig','thomas','walk'],['leipzig','auerbach','walk'],['thomas','auerbach','walk'],
+ ['leipzig','voelker','tram'],['thomas','spinnerei','tram'],
+ ['chemnitzhbf','marx','walk'],['marx','tietz','walk'],['marx','smac','walk'],['tietz','smac','walk'],['tietz','industrie','tram'],['chemnitzhbf','augustusburg','rail'],
+ ['hbf','goerlitzhbf','rail'],['goerlitzhbf','goerlitz','walk'],['goerlitz','warenhaus','walk'],['goerlitz','peters','walk'],['peters','bruecke','walk'],['goerlitz','himmelreich','walk'],['goerlitz','rakotz','car'],
+ ['hbf','tud','tram'],['tud','grossergarten','walk'],['kunsthof','infineon','tram'],['infineon','esmc','tram'],['infineon','mhm','tram']
+];
+
+const TOURS = [
+ {k:'01',n:'老城巴洛克一日',note:'老城核心景點都在步行 10 分鐘內。綠穹珍寶館請先預約時段票；冬季日落早，傍晚改排室內或聖誕市集。',
+  steps:[
+   ['08:30','frauenkirche','清晨的聖母教堂','趁人潮還沒湧入，先在新市集廣場拍教堂全景，近看外牆深淺石塊拼接的痕跡。'],
+   ['09:00','fuerstenzug','君王出巡圖','沿奧古斯都街走，看 102 公尺長的瓷磚壁畫一路排開。','🚶 步行 3 分鐘'],
+   ['09:30','schloss','王宮・綠穹珍寶館','依預約時段進歷史綠穹，再看新綠穹與土耳其廳，抓 2.5 小時左右。','🚶 步行 2 分鐘'],
+   ['12:15','sophienkeller','午餐：醋燜牛肉','到隔壁的地窖餐廳吃薩克森傳統菜，甜點來份奶渣煎餅。','🚶 步行 3 分鐘'],
+   ['13:45','zwinger','茨溫格宮＋大師畫廊','先繞中庭與城牆步道，再進畫廊找拉斐爾的《西斯汀聖母》。','🚶 步行 3 分鐘'],
+   ['16:30','semperoper','森帕歌劇院','參加建築導覽，或確認晚上演出有沒有剩餘票。','🚶 步行 2 分鐘'],
+   ['17:15','bruehl','布呂爾平台黃昏','走上「歐洲陽台」，看易北河上的明輪船靠岸。','🚶 步行 5 分鐘'],
+   ['18:00','altmarkt','（冬季限定）聖誕市集','11/25–12/24 期間來這裡喝杯熱紅酒、配一片史多倫。','🚶 步行 7 分鐘'],
+   ['19:15','canaletto','對岸看老城夜景','過奧古斯都橋到新城河岸，藍調時刻拍下「卡納萊托視角」。','🚶 步行 15 分鐘'],
+   ['20:30','watzke','自釀啤酒收尾','搭電車到河邊啤酒廳，用一杯現釀皮爾森結束第一天。','🚋 電車約 15 分鐘']
+  ]},
+ {k:'02',n:'新城＋易北河東岸',note:'明輪遊船主要在春季到秋季營運，冬季可改搭公車往皮爾尼茨。登山纜車出發前先查營運狀態。',
+  steps:[
+   ['09:00','pfunds','全世界最美的乳品店','一早來看滿牆手繪彩磚，買杯鮮奶或起司。'],
+   ['09:45','kunsthof','藝術庭院通道','逛彩繪庭院與排水管音樂牆，順便晃晃周邊小店。','🚶 步行 5 分鐘'],
+   ['10:45','markthalle','新城市集館早午餐','在市集館的熟食攤吃點東西。','🚶 步行 10 分鐘'],
+   ['11:30','reiter','金色騎士像','沿主街林蔭道走到河邊，跟強者奧古斯特打招呼。','🚶 步行 8 分鐘'],
+   ['12:00','bruehl','露台岸搭明輪船','從布呂爾平台下方碼頭上船，逆流往東慢慢開。','🚶 過橋步行 10 分鐘'],
+   ['14:00','pillnitz','皮爾尼茨宮','在中國風夏宮與花園散步，看那株兩百多歲的山茶花。','⛴ 遊船約 1.5–2 小時'],
+   ['16:00','toscana','下午茶：奶蛋起司蛋糕','回到藍色奇蹟橋南端，在老咖啡館吃薩克森三層蛋糕。','🚋 公車約 25 分鐘'],
+   ['16:45','blaues','走過藍色奇蹟橋','步行過橋，從橋上看兩岸山坡與別墅。','🚶 步行 5 分鐘'],
+   ['17:15','schwebebahn','登山纜車看夕陽','搭百年纜車上山，在觀景點看整個易北河谷染成金色。','🚶 步行 3 分鐘'],
+   ['18:30','elbschloesser','城堡露台晚餐','沿山坡往城區方向，到易北河城堡的露台吃晚餐。','🚋 公車＋步行約 20 分鐘']
+  ]},
+ {k:'03',n:'薩克森小瑞士',note:'S1 從中央車站出發沿易北河往東南。巴斯泰免門票全天開放；要穿好走的鞋，冬季步道可能結冰。',
+  steps:[
+   ['08:00','hbf','搭 S1 出發','中央車站搭 S1 往 Bad Schandau 方向，在 Kurort Rathen 下車。'],
+   ['08:45','bastei','渡河到拉滕','搭小渡輪過易北河，從拉滕村開始往上爬。','🚆 S1 約 35–40 分鐘'],
+   ['09:30','bastei','登上巴斯泰','約 30–45 分鐘爬到 76.5 公尺長的石橋與懸空觀景台。','🚶 步行 30–45 分鐘'],
+   ['11:00','bastei','新拉滕石堡遺址','走進鑿在砂岩裡的中世紀石堡，再下山回渡口。'],
+   ['13:00','koenigstein','一站到國王岩','回 Rathen 站搭 S1，下一站就到。','🚆 S1 約 5 分鐘'],
+   ['13:30','koenigstein','要塞午餐＋城牆步道','在要塞內用餐，繞城牆一圈看易北河大彎與遠方砂岩桌山。','🚌 接駁小車'],
+   ['17:00','hbf','回到德勒斯登','搭 S1 回市區，晚上可以接老城的聖誕市集或音樂會。','🚆 S1 約 40–45 分鐘']
+  ]},
+ {k:'04',n:'邁森＋葡萄酒鄉＋湖中城堡',note:'窄軌蒸汽小火車班次不多，請先查好時刻表再排其他行程；冬季莫里茨堡內部開放時間較短。',
+  steps:[
+   ['09:00','hbf','搭 S1 往邁森','中央車站搭 S1 往西北，約 35–40 分鐘。'],
+   ['09:45','meissen','阿爾布雷希特堡與大教堂','爬上山丘看歐洲硬瓷的發源地與哥德式大教堂。','🚆 S1 約 35–40 分鐘'],
+   ['11:30','meissen','邁森瓷器工坊','看師傅示範拉坯與手繪，逛瓷器博物館。','🚶 步行 15 分鐘'],
+   ['13:00','fummel','老城午餐＋空心酥','在石板巷吃午餐，買幾個一碰就碎的 Meißner Fummel。','🚶 步行 15 分鐘'],
+   ['14:30','wackerbarth','州立酒莊品酒','回到拉德博伊爾，在巴洛克宮殿酒莊試薩克森氣泡酒。','🚆 S1＋電車約 30 分鐘'],
+   ['16:15','radebeul','搭窄軌蒸汽小火車','從 Radebeul Ost 上車，穿過葡萄園與森林。','🚋 電車約 10 分鐘'],
+   ['16:45','moritzburg','湖中城堡夕陽','看黃白色狩獵行宮倒映在湖面上，再搭公車回德勒斯登。','🚂 小火車約 30 分鐘']
+  ]},
+ {k:'05',n:'萊比錫：音樂與和平革命',note:'從德勒斯登搭 ICE／IC 約 1 小時出頭。紀念碑冬季關門較早；棉紡廠多數畫廊週日、週一休館，排行程時留意星期幾。',
+  steps:[
+   ['08:00','hbf','搭火車往萊比錫','德勒斯登中央車站出發，ICE／IC 約 1 小時出頭。'],
+   ['09:15','leipzighbf','歐洲最大的車站之一','先看看挑高大廳，再步行進老城。','🚄 火車約 1 小時 10 分'],
+   ['09:45','nikolai','尼古拉教堂','1989 年和平革命的起點，看看棕櫚造型的柱子。','🚶 步行 8 分鐘'],
+   ['10:30','leipzig','市集廣場與購物拱廊','舊市政廳、梅德勒拱廊一路逛，買個萊比錫雲雀當點心。','🚶 步行 5 分鐘'],
+   ['12:00','auerbach','午餐：浮士德的地窖','在歌德寫進《浮士德》的老地窖吃午餐，出門前摸摸銅像的鞋。','🚶 步行 2 分鐘'],
+   ['13:30','thomas','巴哈的教堂','看巴哈長眠之處；週五、週六常有少年合唱團演出。','🚶 步行 5 分鐘'],
+   ['14:45','voelker','民族大會戰紀念碑','爬上 91 公尺高的紀念碑，俯瞰整個萊比錫。','🚋 電車約 20 分鐘'],
+   ['16:45','spinnerei','棉紡廠藝術區','在舊紡織廠房裡逛畫廊與工作室。','🚋 電車約 30 分鐘'],
+   ['18:30','leipzighbf','搭車回德勒斯登','或留在 KarLi 吃完晚餐再走。','🚋 電車約 20 分鐘']
+  ]},
+ {k:'06',n:'開姆尼茨＋奧古斯都堡',note:'開姆尼茨是 2025 年歐洲文化之都，市區有不少新的公共藝術。奧古斯都堡的纜索鐵路班次不多，冬季城堡開放時間也較短，請先查好。',
+  steps:[
+   ['08:30','hbf','搭區域列車往開姆尼茨','德勒斯登中央車站出發，約 1 小時。'],
+   ['09:45','marx','馬克思大頭像','跟 7 公尺高的「Nischel」合照。','🚄 火車約 1 小時＋步行 10 分鐘'],
+   ['10:15','tietz','2.9 億年前的石化森林','在文化中心中庭看矽化樹幹。','🚶 步行 5 分鐘'],
+   ['11:00','smac','孟德爾頌的百貨大樓','看現代主義建築經典，順便逛考古博物館。','🚶 步行 5 分鐘'],
+   ['13:00','industrie','薩克森工業博物館','吃完午餐去看紡織機與蒸汽機運轉。','🚋 電車約 10 分鐘'],
+   ['15:00','augustusburg','山頂的奧古斯都堡','搭區域列車再轉百年纜索鐵路上山，看機車博物館與厄爾士山景。','🚆 火車＋纜索鐵路約 40 分鐘'],
+   ['18:00','hbf','回到德勒斯登','經開姆尼茨轉車回德勒斯登。','🚄 火車約 1.5 小時']
+  ]},
+ {k:'07',n:'Görlitz＋Rakotzbrücke',note:'Rakotzbrücke 大眾運輸不方便，這條路線以租車為主；只搭火車的話，建議格爾利茨排一天，Rakotzbrücke 另一天經 Weißwasser 前往。太陽管風琴示奏通常在週二、四、日中午。',
+  steps:[
+   ['07:30','hbf','往格爾利茨出發','搭區域列車往東（或開車約 1.5 小時）。'],
+   ['09:15','goerlitz','老城與市政廳','從下市集廣場開始，登上市政廳塔樓看整片紅瓦屋頂。','🚄 火車約 1.5 小時＋步行 15 分鐘'],
+   ['10:45','warenhaus','布達佩斯大飯店的百貨公司','看 1913 年新藝術百貨的外觀，再逛 Marienplatz 一帶。','🚶 步行 8 分鐘'],
+   ['11:45','peters','太陽管風琴','中午 12 點聽 1703 年的太陽管風琴示奏（依日期而定）。','🚶 步行 10 分鐘'],
+   ['12:30','bruecke','走路到波蘭','過老城橋到 Zgorzelec，從對岸拍格爾利茨全景。','🚶 步行 3 分鐘'],
+   ['13:15','himmelreich','午餐：西里西亞天堂','回老城吃燻豬肉配乾果醬汁的地方菜。','🚶 步行 5 分鐘'],
+   ['15:00','rakotz','開車往惡魔橋','往北開進盧薩蒂亞的森林，抵達克羅姆勞杜鵑花園。','🚗 開車約 1 小時'],
+   ['16:15','rakotz','湖畔看圓形倒影','沿湖邊步道找不同角度，看橋與倒影合成一個圓。','🚶 停車場步行約 15 分鐘'],
+   ['19:00','hbf','回到德勒斯登','開車回德勒斯登。','🚗 開車約 1.5 小時']
+  ]}
+];
+
+/* ============ STATE ============ */
+const S = {view:'map', filter:new Set(), sel:null, labels:true, links:true, tilt:false, favOnly:false,
+  listGroup:'theme', terrain:true, cover:true, regions:true, listFav:false, ch:0, step:0, playing:null};
+let FAV = new Set();
+try{ FAV = new Set(JSON.parse(localStorage.getItem('dresden-island-fav')||'[]')); }catch(e){}
+function saveFav(){ try{ localStorage.setItem('dresden-island-fav', JSON.stringify([...FAV])); }catch(e){} }
+const byId = Object.fromEntries(SPOTS.map(s=>[s.id,s]));
+const $ = s=>document.querySelector(s);
+
+/* ============ GEOMETRY ============ */
+const R = 34, W = Math.sqrt(3)*R;
+const gpos = (col,row)=>[col + ((row%2+2)%2 ? .5 : 0), row];
+const px = (gx,gy)=>[gx*W, gy*1.5*R];
+function hexPts(r,dy=0){ const a=[]; for(let i=0;i<6;i++){ const t=Math.PI/180*(60*i-30); a.push((r*Math.cos(t)).toFixed(1)+','+(r*Math.sin(t)+dy).toFixed(1)); } return a.join(' '); }
+function mix(hex,t){ const n=parseInt(hex.slice(1),16); const r=n>>16,g=n>>8&255,b=n&255; const f=v=>Math.round(v+(255-v)*t); return `rgb(${f(r)},${f(g)},${f(b)})`; }
+function dark(hex,t){ const n=parseInt(hex.slice(1),16); const r=n>>16,g=n>>8&255,b=n&255; const f=v=>Math.round(v*(1-t)); return `rgb(${f(r)},${f(g)},${f(b)})`; }
+function smooth(pts){ let d=`M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for(let i=0;i<pts.length-1;i++){ const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+    const c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6], c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];
+    d+=` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`; }
+  return d; }
+
+/* ============ BUILD MAP ============ */
+
+/* ---- terrain: approximate elevations (m) at control points, IDW interpolated ---- */
+const NEISSE=[[19.6,-2.2],[19.7,-0.5],[19.5,3],[19.2,6],[19.4,8.3]];
+const RIVER=[[-1.8,2.5],[0.1,3.7],[1.6,4.5],[3,4.15],[5,4],[7,4],[9,4.05],[10,4],[11.2,4.55],[12,6.2],[11.1,7.7],[11.4,8.6],[12.6,9.1],[14,8.9],[15.8,9.5]];
+const ELEV_PTS=[
+ ...RIVER.map(([a,b],i)=>[a,b,i<9?110:118]),
+ // Dresden & surroundings
+ [8,0,250],[10,1,265],[12,2,240],[11,2.6,215],[13,3.6,300],[4.5,1,175],[2.5,2.4,185],[1,2,150],[0.5,1,150],[6.5,2,150],
+ [6,8,125],[9,8,135],[7,9.5,230],[4,10,330],[1,10.5,460],[-1,11,600],[-3,11.5,780],[-6,11,720],[-6,9,450],[-8,7,350],
+ // Sächsische Schweiz (sandstone)
+ [12,8,305],[13,10,360],[13.5,7,280],[14.5,8.5,380],[12.5,10.5,420],[10.5,9.5,260],[15,10.5,400],[12.5,5,118],
+ // Mittelsachsen
+ [-1,4,240],[-2,2,180],[1,6,230],[2,8,280],
+ // Chemnitz
+ [-2.5,7,300],[-3,6,300],[-1,8,500],[-4,8,330],[-5,6.5,330],[-3.5,7,310],
+ // Görlitz / Lausitz
+ [15.5,-1,125],[17,-2,130],[13.5,-1,140],[14.5,1,170],[16,4,200],[17.5,3,205],[19.5,3,190],[17,6.5,350],[14.5,3,230],[14,5,330],[16,1.5,170],[19.5,-2,140],[19.5,7,260],
+ // Leipzig lowland
+ [-4.5,1,113],[-7,2,115],[-3.5,3,125],[-4,-1,115],[-8,0,110],[-6,-2,110],[-2,-1,120]
+];
+function elev(gx,gy){ let num=0,den=0; for(const [a,b,e] of ELEV_PTS){ const d2=(gx-a)**2+((gy-b)*1.0)**2; if(d2<1e-4) return e; const w=1/Math.pow(d2,1.6); num+=w*e; den+=w; } return num/den; }
+function hOf(e){ return S.terrain ? 3+Math.max(0,e-100)*0.065 : 0; }
+function landColor(e){ return e<140?'#E8E0C6':e<200?'#E2D6B6':e<300?'#D9C9A2':e<450?'#CDB98E':e<650?'#BFA87D':'#AE966C'; }
+/* ---- generalized land cover (from general geography, not satellite data) ---- */
+const COVER={
+  urban:{n:'城市',c:'#E3DACE'}, field:{n:'農田',c:'#EADFA8'}, meadow:{n:'草地',c:'#D4DEA6'},
+  forest:{n:'森林',c:'#AFC68A'}, vine:{n:'葡萄園',c:'#D9D59C'}, rock:{n:'砂岩',c:'#E3C99A'}, lake:{n:'湖泊',c:'#93C2D4'}
+};
+const inE=(gx,gy,cx,cy,rx,ry)=>((gx-cx)/rx)**2+((gy-cy)/ry)**2<1;
+const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
+function cover(gx,gy){
+  const r=hash(gx,gy);
+  const lakes=[[-4.6,4.3,.6],[-5.7,4.0,.5],[4.0,0.0,.45],[5.6,-0.6,.4],[13.2,-1.8,.55],[12.4,-0.9,.45]];
+  for(const [a,b,rr] of lakes) if(Math.hypot(gx-a,gy-b)<rr) return 'lake';
+  const towns=[[6.8,4.6,3.3,3.1],[-5,1,2.0,1.6],[-3.3,7.2,1.6,1.2],[17.9,3.6,1.5,1.1],[1,2.1,.7,.6],[2.4,3,.9,.5],[11.3,7.2,.6,.5],[14.3,3,.6,.5],[-0.3,8.8,.6,.5],[16,4,.4,.4]];
+  for(const t of towns) if(inE(gx,gy,...t)) return 'urban';
+  if(gx>=-0.2&&gx<=3.6&&gy>=2.3&&gy<=3.6) return 'vine';
+  if(gx>=9.8&&gx<=13.2&&gy>=2.4&&gy<=4.6&&r<.6) return 'vine';
+  if(gx>=11.5&&gx<=15.8&&gy>=6.6) return r<.42?'rock':'forest';
+  if(gx>=7.5&&gx<=11.6&&gy>=-1.2&&gy<=2.2) return 'forest';
+  if(gx>=2.4&&gx<=6.6&&gy>=-2.2&&gy<=1.6) return r<.75?'forest':'meadow';
+  if(gx>=11.5&&gx<=17&&gy<=1.2) return r<.75?'forest':'meadow';
+  if(gx>=15&&gy>=5.8) return r<.6?'forest':'meadow';
+  if(inE(gx,gy,2,7.8,1.3,1.0)) return 'forest';
+  if(gy>=9.6&&gx<11) return r<.7?'forest':'meadow';
+  if(inE(gx,gy,-6.3,2.8,.7,.6)) return 'forest';
+  return r<.66?'field':'meadow';
+}
+function deco(g,kind,r,seed){
+  const k=r/34;
+  if(kind==='forest'){ [[-11,-3],[7,-9],[3,8],[-3,-12],[12,4]].slice(0,seed<.5?4:5).forEach(([x,y])=>{ x*=k;y*=k;
+      el('ellipse',{cx:x,cy:y+3.5*k,rx:4.2*k,ry:1.6*k,fill:'rgba(60,80,40,.25)'},g);
+      el('path',{d:`M${x},${y-6*k} L${x+4.4*k},${y+3*k} L${x-4.4*k},${y+3*k}Z`,fill:'#5E8B4C'},g);
+      el('path',{d:`M${x},${y-9*k} L${x+3.2*k},${y-1.5*k} L${x-3.2*k},${y-1.5*k}Z`,fill:'#729E5C'},g); }); }
+  else if(kind==='urban'){ [[-10,-4],[2,-10],[9,0],[-3,6],[-12,6]].slice(0,seed<.5?4:5).forEach(([x,y],i)=>{ x*=k;y*=k; const w=7*k,h=(5+(i%3)*2)*k;
+      el('rect',{x:x-w/2,y:y-h,width:w,height:h,fill:'#F7F2EA',stroke:'#B7A893','stroke-width':.6},g);
+      el('path',{d:`M${x-w/2-1},${y-h} L${x},${y-h-3.5*k} L${x+w/2+1},${y-h}Z`,fill:i%2?'#C46E50':'#8E8A86'},g); }); }
+  else if(kind==='field'){ const a=seed<.5?1:-1; for(let i=-2;i<=2;i++) el('line',{x1:-14*k,y1:(i*6-6*a)*k,x2:14*k,y2:(i*6+6*a)*k,stroke:i%2?'#D9C97E':'#F2E9BE','stroke-width':2.2*k,'stroke-linecap':'round'},g); }
+  else if(kind==='meadow'){ [[-8,-5],[6,-6],[0,5],[9,6],[-9,6]].forEach(([x,y])=>el('circle',{cx:x*k,cy:y*k,r:1.3*k,fill:'#A9BE7A'},g)); }
+  else if(kind==='vine'){ for(let i=-2;i<=2;i++) for(let j=-3;j<=3;j++) el('circle',{cx:(j*4.5+i*1.2)*k,cy:i*5.5*k,r:1.2*k,fill:i%2?'#8FA45E':'#7E6A8C'},g); }
+  else if(kind==='rock'){ [[-8,2,13],[3,-3,18],[11,5,10]].forEach(([x,y,h])=>{ x*=k;y*=k;h*=k; const w=6*k;
+      el('path',{d:`M${x-w/2},${y} L${x-w/2},${y-h+2} Q${x},${y-h-2} ${x+w/2},${y-h+2} L${x+w/2},${y}Z`,fill:'#D2AE78',stroke:'#A9824F','stroke-width':.7},g);
+      el('line',{x1:x-w/2+1,y1:y-h*.45,x2:x+w/2-1,y2:y-h*.45,stroke:'#A9824F','stroke-width':.5},g); }); }
+  else if(kind==='lake'){ [[-6,-2],[5,4]].forEach(([x,y])=>el('path',{d:`M${(x-5)*k},${y*k} q${2.5*k},${-2*k} ${5*k},0 t${5*k},0`,fill:'none',stroke:'#D8ECF2','stroke-width':1.1},g)); }
+}
+function shade(hex,e){ const t=Math.min(.22,Math.max(0,(e-150)/2600)); const n=parseInt(hex.slice(1),16); const f=v=>Math.round(v*(1-t)); return `rgb(${f(n>>16)},${f(n>>8&255)},${f(n&255)})`; }
+// hexagonal prism: top at (0,0), extruded downward by h; faces: left lighter, right darker
+function prism(g,r,h,topFill,leftFill,rightFill,drawTop){
+  const w=Math.sqrt(3)/2*r;
+  if(h>0){
+    el('polygon',{points:`${-w},${r/2} 0,${r} 0,${r+h} ${-w},${r/2+h}`,fill:leftFill},g);
+    el('polygon',{points:`0,${r} ${w},${r/2} ${w},${r/2+h} 0,${r+h}`,fill:rightFill},g);
+  }
+  if(drawTop) el('polygon',{points:hexPts(r),fill:topFill,stroke:'rgba(150,130,95,.35)','stroke-width':.8},g);
+}
+function placeSpots(){ SPOTS.forEach(s=>{ const [gx,gy]=gpos(...s.p); const [x,y]=px(gx,gy); s.elev=elev(gx,gy); s.h=hOf(s.elev); s.x=x; s.by=y; s.y=y-s.h; }); }
+const svg = $('#map'); const NS='http://www.w3.org/2000/svg';
+const el=(tag,attrs={},parent)=>{ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; };
+let FULL;
+function buildMap(){
+  placeSpots();
+  svg.innerHTML='';
+  const defs=el('defs',{},svg);
+  const pat=el('pattern',{id:'waves',width:40,height:16,patternUnits:'userSpaceOnUse'},defs);
+  el('path',{d:'M0 8 Q10 3 20 8 T40 8',fill:'none',stroke:'#C4D9DE','stroke-width':1.2},pat);
+  // land + terrain
+  const land=[]; let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  for(let row=-4;row<=12;row++) for(let col=-10;col<=21;col++){
+    const [gx,gy]=gpos(col,row);
+    const d=((gx-6.8)/8.4)**2+((gy-5.2)/6.3)**2;
+    const d2=((gx+3.6)/5.0)**2+((gy-3.8)/6.2)**2;
+    const d3=((gx-16.6)/4.6)**2+((gy-2.4)/5.6)**2;
+    const noise=.09*Math.sin(gx*1.7+gy*.9)+.06*Math.cos(gx*.6-gy*1.9);
+    let near=false; for(const sp of SPOTS){ const [sx,sy]=gpos(...sp.p); if(Math.hypot(sx-gx,(sy-gy)*0.87)<1.25){near=true;break;} }
+    if(d<.9+noise||d2<.92+noise||d3<.92+noise||near){ const [x,y]=px(gx,gy); const e=elev(gx,gy); land.push([x,y,e,gx,gy]); minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y-hOf(e));maxY=Math.max(maxY,y); }
+  }
+  FULL={x:minX-W*1.2,y:minY-R*1.6,w:(maxX-minX)+W*2.4,h:(maxY-minY)+R*3.2};
+  el('rect',{x:FULL.x-3000,y:FULL.y-3000,width:FULL.w+6000,height:FULL.h+6000,fill:'#D6E5E8'},svg);
+  el('rect',{x:FULL.x-3000,y:FULL.y-3000,width:FULL.w+6000,height:FULL.h+6000,fill:'url(#waves)',opacity:.7},svg);
+  const gL=el('g',{},svg);
+  land.sort((a,b)=>a[1]-b[1]).forEach(([x,y,e,gx,gy])=>{ const kind=S.cover?cover(gx,gy):null; const ee=kind==='lake'?Math.min(e,elev(gx,gy)-15):e; const h=hOf(ee);
+    const g=el('g',{transform:`translate(${x.toFixed(1)},${(y-h).toFixed(1)})`},gL);
+    prism(g,R*.995,h+5,kind?shade(COVER[kind].c,e):landColor(e),'#C9B48F','#B9A27C',true);
+    if(kind) deco(g,kind,R,hash(gy,gx)); });
+  // river (sits on the valley floor)
+  const rH=hOf(112);
+  const rp=RIVER.map(([a,b])=>{ const [x,y]=px(a,b); return [x,y-rH]; });
+  const rd=smooth(rp);
+  el('path',{d:rd,fill:'none',stroke:'#B9D6E0','stroke-width':R*1.05,'stroke-linecap':'round'},svg);
+  el('path',{d:rd,fill:'none',stroke:'#6AA6BE','stroke-width':R*.62,'stroke-linecap':'round',id:'riverPath'},svg);
+  const tx=el('text',{class:'riverlab',dy:4},svg); const tp=el('textPath',{href:'#riverPath',startOffset:'30%'},tx); tp.textContent='Elbe 易北河';
+  const nd=smooth(NEISSE.map(([a,b])=>{ const [x,y]=px(a,b); return [x,y-hOf(elev(a,b))]; }));
+  el('path',{d:nd,fill:'none',stroke:'#B9D6E0','stroke-width':R*.6,'stroke-linecap':'round'},svg);
+  el('path',{d:nd,fill:'none',stroke:'#6AA6BE','stroke-width':R*.34,'stroke-linecap':'round',id:'neissePath'},svg);
+  const tx2=el('text',{class:'riverlab',dy:3.5,style:'font-size:9px;letter-spacing:.3em'},svg); const tp2=el('textPath',{href:'#neissePath',startOffset:'62%'},tx2); tp2.textContent='Neiße 尼斯河';
+  // regions
+  const gR=el('g',{class:'regions',id:'gRegions'},svg);
+  // type: c = 城市／城鎮, d = 德勒斯登市區, l = 地區／地形
+  [[9.4,6.15,'Dresden','德勒斯登','c'],[1.2,0.15,'Meißen','邁森','c'],[3.1,2.0,'Radebeul','拉德博伊爾','c'],[4.5,-0.05,'Moritzburg','莫里茨堡','c'],
+   [-5.3,-1.3,'Leipzig','萊比錫','c'],[-4.4,5.2,'Chemnitz','開姆尼茨','c'],[17.6,1.6,'Görlitz','格爾利茨','c'],
+   [6.6,1.85,'Neustadt','新城','d'],[2.9,6.2,'Altstadt','老城','d'],[11.2,1.85,'Loschwitz','洛施維茨','d'],[13.6,6.3,'Pillnitz','皮爾尼茨','d'],[9.4,9.6,'Dresden-Süd','南側市區','d'],
+   [13.9,7.6,'Sächsische Schweiz','薩克森小瑞士','l'],[-1.2,10.5,'Erzgebirge','厄爾士山','l'],[0.2,6.6,'Mittelsachsen','薩克森中部丘陵','l'],
+   [6.6,-1.25,'Silicon Saxony','半導體聚落','l'],[14.6,-2.4,'Oberlausitz','上盧薩蒂亞','l'],[21,4.5,'Polska','波蘭','l']]
+   .forEach(([gx,gy,de,zh,t])=>{ const [x,y0]=px(gx,gy); const y=y0-hOf(elev(gx,gy))-6;
+     const fsDe=t==='c'?14:12.5, fsZh=t==='c'?10:9.5;
+     const w=Math.max(de.length*fsDe*.58, zh.length*fsZh*1.02)+(t==='c'?30:20), h=t==='c'?36:32;
+     const g=el('g',{class:'rg rg-'+t,transform:`translate(${x.toFixed(1)},${y.toFixed(1)})`},gR);
+     el('rect',{x:-w/2+1.5,y:-h/2+2.5,width:w,height:h,rx:h/2,class:'rg-shadow'},g);
+     el('rect',{x:-w/2,y:-h/2,width:w,height:h,rx:h/2,class:'rg-box'},g);
+     if(t==='c'){ el('path',{d:`M-5,${h/2-1} L0,${h/2+6} L5,${h/2-1}Z`,class:'rg-pin'},g); el('circle',{cx:-w/2+13,cy:-4,r:3.6,class:'rg-dot'},g); }
+     const dx=t==='c'?6:0;
+     const a=el('text',{x:dx,y:-2.5,class:'rg-de','font-size':fsDe},g); a.textContent=de;
+     const b=el('text',{x:dx,y:11,class:'rg-zh','font-size':fsZh},g); b.textContent=zh; });
+  // links
+  const gK=el('g',{class:'links',id:'gLinks'},svg);
+  LINKS.forEach(([a,b,m],i)=>{ const A=byId[a],B=byId[b],M=MODES[m];
+    const dx=B.x-A.x,dy=B.y-A.y,len=Math.hypot(dx,dy); const k=(i%2?1:-1)*Math.min(.22,40/len+.08);
+    const cx=(A.x+B.x)/2-dy*k, cy=(A.y+B.y)/2+dx*k;
+    const p=el('path',{d:`M${A.x},${A.y} Q${cx},${cy} ${B.x},${B.y}`,class:'link',stroke:M.c,'stroke-width':M.w,'stroke-dasharray':M.d},gK);
+    p.dataset.a=a; p.dataset.b=b; });
+  el('g',{id:'gRoute'},svg);
+  // cells
+  const gC=el('g',{id:'gCells'},svg);
+  [...SPOTS].sort((a,b)=>a.by-b.by).forEach(s=>{
+    const c=THEMES[s.t].c;
+    const g=el('g',{class:'cell',transform:`translate(${s.x},${s.y})`},gC); g.dataset.id=s.id;
+    const L=el('g',{class:'lift'},g);
+    prism(L,R*.9,S.terrain?Math.max(7,s.h+4):7,null,dark(c,.08),dark(c,.28),false);
+    el('polygon',{points:hexPts(R*.9),fill:mix(c,.78),stroke:c,class:'top'},L);
+    if(s.t==='hub') el('polygon',{points:hexPts(R*.62),fill:'none',stroke:c,'stroke-dasharray':'3 3'},L);
+    const ic=el('text',{class:'ico',y:-9},L); ic.textContent=s.e;
+    const fs=Math.max(6.2,Math.min(9,60/(s.ds.length*.56)));
+    const lb=el('text',{class:'lab',y:10,style:`font-size:${fs.toFixed(1)}px`},L); lb.textContent=s.ds;
+    const lb2=el('text',{class:'lab2',y:19.5},L); lb2.textContent=s.s;
+    const fv=el('g',{class:'favdot',transform:`translate(${R*.5},${-R*.62})`},L);
+    el('circle',{r:8,fill:'#FFF3D6',stroke:'#E0A526','stroke-width':1.5},fv);
+    const ft=el('text',{'text-anchor':'middle','dominant-baseline':'central','font-size':10,fill:'#C88B10'},fv); ft.textContent='★';
+    g.addEventListener('click',()=>{ if(drag.moved) return; select(s.id,true); });
+  });
+  svg.appendChild($('#gRegions'));
+  el('g',{id:'gBadges'},svg);
+  el('g',{id:'gRing'},svg);
+}
+
+/* ============ VIEWBOX / PAN ZOOM ============ */
+let vb;
+function aspect(){ return (svg.clientHeight||1)/(svg.clientWidth||1); }
+function setVB(){ svg.setAttribute('viewBox',`${vb.x.toFixed(1)} ${vb.y.toFixed(1)} ${vb.w.toFixed(1)} ${vb.h.toFixed(1)}`); }
+function fit(x0,y0,x1,y1){ const a=aspect(); let w=Math.max(x1-x0,(y1-y0)/a); const h=w*a; return {x:(x0+x1)/2-w/2,y:(y0+y1)/2-h/2,w,h}; }
+function fitFull(){ const pad=svg.clientWidth>=700?W*2.6:0; return fit(FULL.x-pad,FULL.y,FULL.x+FULL.w,FULL.y+FULL.h); }
+function initialVB(){
+  if(svg.clientWidth<700){ const a=px(3,0.6),b=px(10.2,8.4); return fit(a[0],a[1],b[0],b[1]); }
+  return fitFull();
+}
+function clampW(w){ const f=fitFull(); return Math.min(Math.max(w,f.w/6),f.w*1.15); }
+function zoomAt(factor,cx,cy){ const nw=clampW(vb.w*factor); const r=nw/vb.w; vb={x:cx-(cx-vb.x)*r,y:cy-(cy-vb.y)*r,w:nw,h:nw*aspect()}; setVB(); }
+let anim=null;
+function flyTo(cx,cy,w,ms=650){ w=clampW(w); const a=aspect(); const from={...vb}; const to={x:cx-w/2,y:cy-w*a/2,w,h:w*a};
+  cancelAnimationFrame(anim); const t0=performance.now();
+  const step=t=>{ let k=Math.min(1,(t-t0)/ms); k=1-Math.pow(1-k,3);
+    vb={x:from.x+(to.x-from.x)*k,y:from.y+(to.y-from.y)*k,w:from.w+(to.w-from.w)*k,h:from.h+(to.h-from.h)*k}; setVB(); if(k<1) anim=requestAnimationFrame(step); };
+  anim=requestAnimationFrame(step); }
+function clientToSvg(ex,ey){ const r=svg.getBoundingClientRect(); return [vb.x+(ex-r.left)/r.width*vb.w, vb.y+(ey-r.top)/r.height*vb.h]; }
+const drag={pts:new Map(),moved:false,sx:0,sy:0,start:null,dist:0};
+svg.addEventListener('pointerdown',e=>{ drag.pts.set(e.pointerId,[e.clientX,e.clientY]); if(drag.pts.size===1){drag.moved=false;drag.sx=e.clientX;drag.sy=e.clientY;}
+  if(drag.pts.size===2){ const [p,q]=[...drag.pts.values()]; drag.dist=Math.hypot(p[0]-q[0],p[1]-q[1]); } cancelAnimationFrame(anim); });
+window.addEventListener('pointermove',e=>{ if(!drag.pts.has(e.pointerId)) return; const prev=drag.pts.get(e.pointerId); drag.pts.set(e.pointerId,[e.clientX,e.clientY]);
+  if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>6) drag.moved=true;
+  if(drag.pts.size===1){ const k=vb.w/svg.clientWidth; vb.x-=(e.clientX-prev[0])*k; vb.y-=(e.clientY-prev[1])*k; setVB(); }
+  else if(drag.pts.size===2){ const [p,q]=[...drag.pts.values()]; const d=Math.hypot(p[0]-q[0],p[1]-q[1]); if(drag.dist>0){ const [cx,cy]=clientToSvg((p[0]+q[0])/2,(p[1]+q[1])/2); zoomAt(drag.dist/d,cx,cy);} drag.dist=d; drag.moved=true; } });
+const endPtr=e=>{ drag.pts.delete(e.pointerId); if(drag.pts.size===0) setTimeout(()=>drag.moved=false,30); };
+window.addEventListener('pointerup',endPtr); window.addEventListener('pointercancel',endPtr);
+svg.addEventListener('wheel',e=>{ e.preventDefault(); const [cx,cy]=clientToSvg(e.clientX,e.clientY); zoomAt(Math.pow(1.0018,e.deltaY),cx,cy); },{passive:false});
+$('#zin').onclick=()=>zoomAt(.75,vb.x+vb.w/2,vb.y+vb.h/2);
+$('#zout').onclick=()=>zoomAt(1.33,vb.x+vb.w/2,vb.y+vb.h/2);
+$('#zleg').onclick=()=>{ const L=$('#legend'); if(window.innerWidth<=600) L.classList.toggle('show'); else L.classList.toggle('hide'); };
+$('#zfit').onclick=()=>{ const f=fitFull(); flyTo(f.x+f.w/2,f.y+f.h/2,f.w); };
+window.addEventListener('resize',()=>{ if(!vb) return; const cx=vb.x+vb.w/2,cy=vb.y+vb.h/2; vb={x:cx-vb.w/2,y:cy-vb.w*aspect()/2,w:vb.w,h:vb.w*aspect()}; setVB(); });
+
+/* ============ MAP STATE ============ */
+function visible(s){ if(S.favOnly && !FAV.has(s.id)) return false; if(S.filter.size && !S.filter.has(s.t) && s.t!=='hub') return false; return true; }
+function applyMap(){
+  document.querySelectorAll('.cell').forEach(g=>{ const s=byId[g.dataset.id];
+    g.classList.toggle('dim',!visible(s)); g.classList.toggle('sel',S.sel===s.id); g.classList.toggle('fav',FAV.has(s.id)); });
+  svg.classList.toggle('nolabels',!S.labels);
+  $('#gLinks').classList.toggle('off',!S.links);
+  document.querySelectorAll('.link').forEach(p=>{ const a=byId[p.dataset.a],b=byId[p.dataset.b];
+    const vis=visible(a)&&visible(b); const touch=S.sel&&(p.dataset.a===S.sel||p.dataset.b===S.sel);
+    p.classList.toggle('hi',!!touch); p.classList.toggle('faint',(!vis&&!touch)||(S.sel&&!touch&&S.view==='map')); });
+  const gr=$('#gRing'); gr.innerHTML='';
+  if(S.sel){ const s=byId[S.sel]; const g=el('g',{transform:`translate(${s.x},${s.y})`},gr); el('polygon',{points:hexPts(R*.95),class:'ring',style:'transform-box:fill-box;transform-origin:center'},g); }
+  $('#tiltWrap').classList.toggle('tilt',S.tilt);
+}
+
+/* ============ CHIPS / TOGGLES ============ */
+function buildChips(){
+  const box=$('#chips'); box.innerHTML='';
+  const all=document.createElement('button'); all.className='chip all'+(S.filter.size?'':' on'); all.textContent='全部'; all.style.setProperty('--c','#2A2931');
+  all.onclick=()=>{S.filter.clear();buildChips();applyMap();}; box.appendChild(all);
+  Object.entries(THEMES).forEach(([k,v])=>{ if(k==='hub') return; const b=document.createElement('button');
+    b.className='chip'+(S.filter.has(k)?' on':''); b.style.setProperty('--c',v.c); b.innerHTML=`<i></i>${v.n}`;
+    b.onclick=()=>{ S.filter.has(k)?S.filter.delete(k):S.filter.add(k); buildChips(); applyMap(); }; box.appendChild(b); });
+}
+function bindToggle(id,key){ const b=$(id); b.onclick=()=>{ S[key]=!S[key]; b.classList.toggle('on',S[key]); applyMap(); }; }
+bindToggle('#tgLabels','labels');
+$('#tgRegions').onclick=()=>{ S.regions=!S.regions; $('#tgRegions').classList.toggle('on',S.regions); svg.classList.toggle('noregions',!S.regions); };
+$('#tgCover').onclick=()=>{ S.cover=!S.cover; $('#tgCover').classList.toggle('on',S.cover); const keep=vb; buildMap(); vb=keep; setVB(); applyMap(); drawRoute(); buildLegend(); };
+$('#tgTerrain').onclick=()=>{ S.terrain=!S.terrain; $('#tgTerrain').classList.toggle('on',S.terrain); const keep=vb; buildMap(); vb=keep; setVB(); applyMap(); drawRoute(); }; bindToggle('#tgLinks','links'); bindToggle('#tgTilt','tilt'); bindToggle('#tgFav','favOnly');
+function buildLegend(){ $('#legend').innerHTML=Object.values(MODES).map(m=>`<div><svg width="28" height="8"><line x1="2" y1="4" x2="26" y2="4" stroke="${m.c}" stroke-width="${m.w}" stroke-dasharray="${m.d}" stroke-linecap="round"/></svg>${m.n}</div>`).join('')
+  + (S.cover ? `<div style="margin-top:4px;flex-wrap:wrap;max-width:200px;gap:4px 8px">${Object.values(COVER).map(c=>`<span style="display:inline-flex;align-items:center;gap:3px"><i style="display:inline-block;width:10px;height:9px;background:${c.c};border:1px solid #BFAE90"></i>${c.n}</span>`).join('')}</div>`
+             : `<div style="margin-top:3px">${[110,180,260,380,550,750].map(e=>`<span style="display:inline-block;width:12px;height:9px;background:${landColor(e)};border:1px solid #CDBB9C"></span>`).join('')}<span>&nbsp;海拔 低→高</span></div>`)
+  + `<div style="margin-top:4px;gap:6px;flex-wrap:wrap;max-width:210px"><span style="background:#2A2931;color:#fff;border-radius:9px;padding:0 7px;font-weight:700">城市</span><span style="border:1.4px solid #2F6F8F;color:#1F4E66;border-radius:9px;padding:0 7px;font-weight:700">市區</span><span style="border:1.2px dashed #6E8B4E;background:#EBF3E1;color:#3E5A28;border-radius:9px;padding:0 7px;font-style:italic;font-weight:700">地區</span></div>`
+  + `<div style="color:#8a8378">格子高度＝概略海拔（誇張）</div>`; }
+
+/* ============ DETAIL SHEET ============ */
+function select(id,fromMap){
+  S.sel=id; applyMap(); renderSheet();
+  $('#mascot').hidden=true;
+  if(fromMap && window.innerWidth<900 && vb){ const s=byId[id]; flyTo(s.x, s.y+vb.h*.22, vb.w, 450); }
+}
+function closeSheet(){ S.sel=null; $('#sheet').classList.remove('open'); applyMap(); }
+const PHOTOS = window.PHOTOS || {};
+function esc(t){ return String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function photoBlock(s){
+  const ph=PHOTOS[s.id]; if(!ph) return '';
+  return `<figure class="ph"><img src="${ph.src}" alt="${esc(s.de)}" loading="lazy" onerror="this.closest('figure').remove()">
+    <figcaption>${ph.note?esc(ph.note)+'｜':''}📷 <a href="${ph.page}" target="_blank" rel="noopener">${esc(ph.a||'Wikimedia Commons')}</a>${ph.l?`｜<a href="${ph.lu||ph.page}" target="_blank" rel="noopener">${esc(ph.l)}</a>`:''}｜Wikimedia Commons</figcaption></figure>`;
+}
+function renderSheet(){
+  const s=byId[S.sel]; if(!s) return; const th=THEMES[s.t];
+  const conns=LINKS.filter(l=>l[0]===s.id||l[1]===s.id).map(l=>{ const o=l[0]===s.id?l[1]:l[0]; return `<button data-go="${o}">${MODES[l[2]].i} ${MODES[l[2]].n} → ${byId[o].ds}</button>`; }).join('');
+  let tourInfo='';
+  TOURS.forEach((t,ci)=>t.steps.forEach((st,si)=>{ if(st[1]===s.id && !tourInfo.includes(t.k)) tourInfo+=`<span class="tourtag" data-tour="${ci},${si}">行程 ${t.k}・${t.n} ▸</span> `; }));
+  const city={北側科技園區:'Dresden',萊比錫:'Leipzig',開姆尼茨:'Chemnitz',格爾利茨:'Görlitz',上盧薩蒂亞:'Kromlau',西北近郊:'Sachsen',薩克森小瑞士:'Sachsen'}[s.a]||'Dresden';
+  const q=encodeURIComponent(s.de.split(' · ')[0]+' '+city);
+  $('#sheet').style.setProperty('--c',th.c); $('#sheet').style.setProperty('--cl',mix(th.c,.82));
+  $('#sheet').innerHTML=`
+   <div class="sh"><div class="big">${s.e}</div><div><div class="kick">${th.n} · ${s.a}</div><h2>${s.de}</h2><div class="de">${s.n}</div></div>
+     <div class="btns">${s.t!=='hub'?`<button class="favb ${FAV.has(s.id)?'on':''}" id="favb" aria-label="收藏">${FAV.has(s.id)?'★':'☆'}</button>`:''}<button id="shx" aria-label="關閉">✕</button></div></div>
+   ${photoBlock(s)}
+   <div class="sb">
+     ${tourInfo?`<div>${tourInfo}</div>`:''}
+     <div class="facts"><div><b>建議停留</b>${s.stay}</div><div><b>交通</b>${s.go}</div></div>
+     <p>${s.d}</p>
+     <h4>小提醒</h4><ul>${s.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+     ${conns?`<h4>可以串聯</h4><div class="conn">${conns}</div>`:''}
+     <a class="photolink" href="https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=${encodeURIComponent(s.de.split(' · ')[0]+(s.a==='上盧薩蒂亞'?'':' '+city))}" target="_blank" rel="noopener"><span>📷</span><span><b>看照片</b><small>Wikimedia Commons 圖庫・${s.ds}</small></span><span>↗</span></a>
+     <a class="maplink" href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">在 Google 地圖開啟 ↗</a>
+   </div>`;
+  $('#sheet').classList.add('open'); $('#sheet').scrollTop=0;
+  $('#shx').onclick=closeSheet;
+  const fb=$('#favb'); if(fb) fb.onclick=()=>{ FAV.has(s.id)?FAV.delete(s.id):FAV.add(s.id); saveFav(); renderSheet(); applyMap(); if(S.view==='list') renderList(); };
+  document.querySelectorAll('#sheet [data-go]').forEach(b=>b.onclick=()=>{ const o=byId[b.dataset.go]; select(o.id,false); if(vb) flyTo(o.x,o.y+(window.innerWidth<900?vb.h*.22:0),vb.w,500); });
+  document.querySelectorAll('#sheet [data-tour]').forEach(b=>b.onclick=()=>{ const [c,i]=b.dataset.tour.split(',').map(Number); S.ch=c; S.step=i; setView('tour'); });
+}
+
+/* ============ LIST ============ */
+function renderList(){
+  const q=$('#q').value.trim().toLowerCase();
+  const items=SPOTS.filter(s=>s.t!=='hub').filter(s=>!S.listFav||FAV.has(s.id)).filter(s=>!q||(s.n+s.de+s.d+s.tips.join('')+s.a+THEMES[s.t].n).toLowerCase().includes(q));
+  const groups = S.listGroup==='theme' ? Object.keys(THEMES).filter(k=>k!=='hub').map(k=>({k,n:THEMES[k].n,c:THEMES[k].c,it:items.filter(s=>s.t===k)}))
+                                       : AREAS.map(a=>({k:a,n:a,c:'#2F6F8F',it:items.filter(s=>s.a===a)}));
+  const html=groups.filter(g=>g.it.length).map(g=>`<div class="grp" style="--c:${g.c}"><h3><i></i>${g.n}<small>${g.it.length} 處</small></h3><div class="cards">${
+    g.it.map(s=>`<button class="card" data-id="${s.id}" style="--c:${THEMES[s.t].c}">${PHOTOS[s.id]?`<img class="cth" src="${PHOTOS[s.id].src}" alt="" loading="lazy">`:`<span class="e">${s.e}</span>`}<span><b>${s.de}</b><small>${s.n}</small><div class="m">${s.a}｜${s.stay}</div></span><span class="st ${FAV.has(s.id)?'on':''}" data-star="${s.id}">${FAV.has(s.id)?'★':'☆'}</span></button>`).join('')
+  }</div></div>`).join('');
+  $('#listBody').innerHTML=html||`<div class="empty">${S.listFav?'還沒有收藏，打開任一景點按右上角 ☆ 就能加入。':'找不到符合的景點，換個關鍵字試試。'}</div>`;
+  document.querySelectorAll('#listBody .card').forEach(c=>c.onclick=e=>{ const st=e.target.closest('[data-star]'); if(st){ const id=st.dataset.star; FAV.has(id)?FAV.delete(id):FAV.add(id); saveFav(); renderList(); applyMap(); return; } select(c.dataset.id,false); });
+}
+$('#q').addEventListener('input',renderList);
+document.querySelectorAll('#grpSeg button').forEach(b=>b.onclick=()=>{ S.listGroup=b.dataset.g; document.querySelectorAll('#grpSeg button').forEach(x=>x.classList.toggle('on',x===b)); renderList(); });
+$('#listFav').onclick=()=>{ S.listFav=!S.listFav; $('#listFav').classList.toggle('on',S.listFav); renderList(); };
+
+/* ============ TOUR ============ */
+const toMin=t=>{ const [h,m]=t.split(':').map(Number); return h*60+m; };
+function buildChapters(){ $('#chapters').innerHTML=TOURS.map((t,i)=>`<button data-c="${i}" class="${i===S.ch?'on':''}"><b>${t.k}</b>${t.n}</button>`).join('');
+  document.querySelectorAll('#chapters button').forEach(b=>b.onclick=()=>{ S.ch=+b.dataset.c; S.step=0; stopPlay(); renderTour(true); }); }
+function renderTour(fly){
+  const T=TOURS[S.ch], st=T.steps[S.step], spot=byId[st[1]];
+  buildChapters();
+  $('#chNote').textContent=T.note;
+  $('#stepCard').innerHTML=`${PHOTOS[spot.id]?`<img src="${PHOTOS[spot.id].src}" alt="" style="width:100%;height:150px;object-fit:cover;border-radius:10px;margin-bottom:10px;display:block" onerror="this.remove()">`:''}<div class="stepTop"><span class="t">${st[0]}</span><span class="n">第 ${String(S.step+1).padStart(2,'0')} / ${String(T.steps.length).padStart(2,'0')} 站</span></div>
+    <h3>${spot.e} ${spot.ds} <small style="font-weight:400;color:#716B62;font-size:13px">${spot.s}</small></h3><div style="font-weight:700;color:#D35A3A;font-size:14px;margin-bottom:4px">${st[2]}</div><p>${st[3]}</p>${st[4]?`<div class="mv">從上一站：${st[4]}</div>`:''}<button class="more" id="more">看「${spot.ds}」介紹 ▸</button>`;
+  $('#more').onclick=()=>select(spot.id,false);
+  // scrubber
+  const tr=$('#track'); tr.querySelectorAll('.mk').forEach(m=>m.remove());
+  T.steps.forEach((s,i)=>{ const m=document.createElement('button'); m.className='mk'+(i<S.step?' done':'')+(i===S.step?' cur':''); m.style.left=(toMin(s[0])/1440*100)+'%'; m.title=s[0]+' '+s[2]; m.onclick=()=>{S.step=i;stopPlay();renderTour(true);}; tr.appendChild(m); });
+  $('#fill').style.width=(toMin(st[0])/1440*100)+'%';
+  $('#stepList').innerHTML=T.steps.map((s,i)=>`<li><button data-i="${i}" class="${i===S.step?'on':''}"><span>${s[0]}</span>${byId[s[1]].e}&nbsp;<b style="font-weight:inherit">${byId[s[1]].ds}</b>&nbsp;<small style="color:#716B62">${s[2]}</small></button></li>`).join('');
+  document.querySelectorAll('#stepList button').forEach(b=>b.onclick=()=>{S.step=+b.dataset.i;stopPlay();renderTour(true);});
+  const on=$('#stepList .on'); if(on) on.scrollIntoView({block:'nearest'});
+  $('#prev').disabled=S.step===0; $('#next').textContent=S.step===T.steps.length-1?'下一條行程 →':'下一步 →';
+  drawRoute();
+  S.sel=spot.id; applyMap();
+  S.tourZoomed=true;
+  if(fly && vb){ const pts=[...new Set(T.steps.map(s=>s[1]))].map(i=>byId[i]); const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
+    const span=Math.max(Math.max(...xs)-Math.min(...xs)+W*3,(Math.max(...ys)-Math.min(...ys)+R*4)/aspect());
+    flyTo(spot.x,spot.y,Math.max(Math.min(span,fitFull().w*.75),fitFull().w*(window.innerWidth<900?.42:.5))); }
+}
+function drawRoute(){
+  const g=$('#gRoute'), gb=$('#gBadges'); g.innerHTML=''; gb.innerHTML='';
+  if(S.view!=='tour') return;
+  const T=TOURS[S.ch]; const seq=[]; T.steps.forEach((s,i)=>{ if(!seq.length||seq[seq.length-1].id!==s[1]) seq.push({id:s[1],i}); });
+  const cur=seq.filter(x=>x.i<=S.step);
+  if(cur.length>1){ const pts=cur.map(x=>[byId[x.id].x,byId[x.id].y]); el('path',{d:smooth(pts),class:'route'},g); }
+  const seen=new Set();
+  seq.forEach((x,n)=>{ if(seen.has(x.id)) return; seen.add(x.id); const s=byId[x.id];
+    const b=el('g',{class:'badge'+(x.i>S.step?' future':''),transform:`translate(${s.x-R*.55},${s.y-R*.6})`},gb); el('circle',{r:9},b); const t=el('text',{},b); t.textContent=n+1; });
+}
+function next(){ const T=TOURS[S.ch]; if(S.step<T.steps.length-1){S.step++;} else { S.ch=(S.ch+1)%TOURS.length; S.step=0; } renderTour(true); }
+function prev(){ if(S.step>0){S.step--;renderTour(true);} }
+function stopPlay(){ clearInterval(S.playing); S.playing=null; $('#play').textContent='▶ 自動'; }
+$('#next').onclick=()=>{stopPlay();next();}; $('#prev').onclick=()=>{stopPlay();prev();};
+$('#play').onclick=()=>{ if(S.playing){stopPlay();return;} $('#play').textContent='⏸ 暫停'; S.playing=setInterval(()=>{ const T=TOURS[S.ch]; if(S.step>=T.steps.length-1){stopPlay();return;} next(); },4200); };
+document.addEventListener('keydown',e=>{ if(S.view!=='tour'||e.target.tagName==='INPUT') return; if(e.key==='ArrowRight'){stopPlay();next();} if(e.key==='ArrowLeft'){stopPlay();prev();} });
+
+/* ============ VIEWS ============ */
+function setView(v){
+  if(v==='info'){ $('#modal').hidden=false; return; }
+  const wasTour=S.tourZoomed;
+  S.view=v; stopPlay(); $('#sheet').classList.remove('open');
+  document.querySelectorAll('#views button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  $('#mapView').hidden=v!=='map'; $('#listView').hidden=v!=='list'; $('#tourView').hidden=v!=='tour';
+  const stage=$('#stage');
+  if(v==='map') $('#stageSlotMap').appendChild(stage);
+  if(v==='tour') $('#stageSlotTour').appendChild(stage);
+  if(v==='list'){ renderList(); $('#sheet').classList.remove('open'); }
+  requestAnimationFrame(()=>{ if(vb){ vb.h=vb.w*aspect(); setVB(); }
+    if(v==='tour'){ $('#mascot').hidden=true; S.links=true; renderTour(true); }
+    else { drawRoute(); if(v==='map'){ S.sel=null; if(wasTour){ S.tourZoomed=false; const f=initialVB(); flyTo(f.x+f.w/2,f.y+f.h/2,f.w); } } applyMap(); } });
+}
+document.querySelectorAll('#views button').forEach(b=>b.onclick=()=>setView(b.dataset.v));
+$('#mclose').onclick=()=>$('#modal').hidden=true;
+$('#modal').addEventListener('click',e=>{ if(e.target.id==='modal') $('#modal').hidden=true; });
+
+/* ============ INIT ============ */
+$('#stageSlotMap').appendChild($('#stage'));
+$('#stSpots').textContent=SPOTS.filter(s=>s.t!=='hub').length;
+$('#stLinks').textContent=LINKS.length;
+$('#stTours').textContent=TOURS.length;
+buildMap(); buildChips(); buildLegend();
+requestAnimationFrame(()=>{ vb=initialVB(); setVB(); applyMap(); });
+</script>
+</body>
+</html>
