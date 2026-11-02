@@ -389,7 +389,7 @@ h1{font-family:"Noto Serif TC",serif;font-weight:900;font-size:clamp(26px,4.6vw,
       <li>「🧳 我的行程」：在景點介紹卡按「＋ 加入我的行程」，可以分天排序、調整順序，自動估算停留時間、交通時間與花費（粗估，僅供參考），地圖會畫出路線。行程存在這台裝置的瀏覽器裡。</li>
       <li>地圖右下角可選月份：當月亮點會發光跳動、不在季節的會變淡，冬季遊船路線也會變淡；拖動時間可看日出日落與夜景燈光，勾「雪景」會下雪。</li>
       <li>右上 🎲 讓小明輪隨機推薦景點；📏 進入量距離模式，點兩格顯示直線距離與大約交通時間。</li>
-      <li>「行程」有 7 條一日路線，可逐步或自動播放，地圖會同步畫出路線。</li>
+      <li>「行程」有 8 條一日路線，可逐步或自動播放，地圖會同步畫出路線。</li>
     </ul>
     <h3>市徽</h3>
     <p>地圖上的城市標籤旁是各城市的市徽（德勒斯登、萊比錫、開姆尼茨、邁森、拉德博伊爾、莫里茨堡、格爾利茨），圖檔取自 Wikimedia Commons，屬公有領域的官方標誌。</p>
@@ -420,7 +420,7 @@ const THEMES = {
   tech:{n:'科技與大學',c:'#1F8A8A'},
   hub:{n:'交通樞紐',c:'#5B5B66'}
 };
-const AREAS = ['北側科技園區','老城','新城','易北河東岸','南側市區','西北近郊','薩克森小瑞士','萊比錫','開姆尼茨','格爾利茨','上盧薩蒂亞'];
+const AREAS = ['北側科技園區','老城','新城','易北河東岸','南側市區','西北近郊','薩克森小瑞士','萊比錫','開姆尼茨','格爾利茨','上盧薩蒂亞','厄爾士山麓'];
 const MODES = {
   walk:{n:'步行',i:'🚶',c:'#8A7F70',d:'1 7',w:3},
   tram:{n:'電車／公車',i:'🚋',c:'#3D5A80',d:'8 6',w:3},
@@ -428,7 +428,8 @@ const MODES = {
   sbahn:{n:'S-Bahn',i:'🚆',c:'#4E7A3A',d:'',w:3.4},
   steam:{n:'窄軌蒸汽小火車',i:'🚂',c:'#B03A2E',d:'4 4',w:3.4},
   rail:{n:'火車（ICE／區域）',i:'🚄',c:'#2A2931',d:'12 4 2 4',w:3.2},
-  car:{n:'開車',i:'🚗',c:'#8C6A3F',d:'3 5 9 5',w:3.2}
+  car:{n:'開車',i:'🚗',c:'#8C6A3F',d:'3 5 9 5',w:3.2},
+  bike:{n:'單車',i:'🚲',c:'#2E8B57',d:'2 5',w:3.2}
 };
 
 const SPOTS = [
@@ -607,6 +608,38 @@ const SPOTS = [
  {id:'infineon',ds:'Infineon Dresden',t:'tech',a:'北側科技園區',p:[7,0],e:'⚡',n:'英飛凌德勒斯登廠',de:'Infineon Technologies Dresden · Smart Power Fab',s:'英飛凌',stay:'外觀（不開放參觀）',go:'新城搭電車約 20 分鐘',
   d:'英飛凌在德勒斯登北部的大型半導體廠區。新建的 Smart Power Fab 投資約 50 億歐元，是公司史上最大單筆投資，2026 年 7 月 2 日比原計畫提前數月啟用，讓德勒斯登廠區產能倍增，號稱全球最大的功率半導體與類比／混合訊號晶圓廠，產品主要用在電動車、充電設施、再生能源與資料中心。',
   tips:['廠區不對外開放','新廠約 90% 用水回收再利用、最多可回收 45% 的能源，官方網站有綠色製造的介紹','英飛凌同時也是 ESMC 的股東之一']},
+
+ // 在地延伸（第二批）
+ {id:'hofkirche',ds:'Hofkirche',t:'landmark',a:'老城',p:[4,6],e:'⛪',n:'天主教宮廷教堂（德勒斯登主教座堂）',de:'Katholische Hofkirche · Kathedrale Ss. Trinitatis',s:'宮廷教堂',stay:'30–45 分鐘',go:'老城步行',
+  d:'1739–1755 年由義大利建築師 Chiaveri 設計的巴洛克教堂，是薩克森最大的天主教教堂，也是德勒斯登－邁森教區的主教座堂。屋頂欄杆上立著 78 尊聖人雕像；教堂內有管風琴大師 Gottfried Silbermann 生前最後一件作品，地下墓室安葬著薩克森歷代君主，強者奧古斯特的心臟也存放在這裡。',
+  tips:['教堂免費參觀，有彌撒時請保持安靜','地下墓室通常只能跟導覽參觀，時間依現場公告','就在王宮與森帕歌劇院之間，順路即可']},
+ {id:'kreuzkirche',ds:'Kreuzkirche',t:'landmark',a:'老城',p:[4,7],e:'🎶',n:'十字教堂（十字合唱團）',de:'Kreuzkirche Dresden · Dresdner Kreuzchor',s:'十字教堂',stay:'45 分鐘–1 小時',go:'舊市集廣場旁',
+  d:'舊市集廣場旁的新教主教堂，可容納 3,000 多人，是薩克森最大的教堂之一。這裡是德勒斯登十字合唱團（Dresdner Kreuzchor）的家，這個少年合唱團有將近 800 年歷史，是城市最古老的文化機構。1945 年空襲後只剩塔樓與外牆，1955 年重建完成。',
+  tips:['週六 17:00 常有晚禱（Vesper），節目單約 €5，散場後鐘樓上有銅管樂手演奏','可登上塔樓 54 公尺高的觀景台俯瞰舊市集廣場（約 €5，259 階）','12/24 的十字合唱團聖誕晚禱非常熱門，要提早規劃']},
+ {id:'yenidze',ds:'Yenidze',t:'landmark',a:'老城',p:[3,5],e:'🕌',n:'Yenidze 菸草工廠',de:'Yenidze · ehem. Zigarettenfabrik',s:'清真寺菸廠',stay:'20–30 分鐘（外觀）',go:'茨溫格宮往西步行約 10 分鐘',
+  d:'1909 年完工的香菸工廠，因為當時市中心不准蓋工廠煙囪，業主乾脆把它設計成清真寺的樣子：煙囪偽裝成宣禮塔、頂上一座彩色玻璃圓頂，在德勒斯登天際線裡非常顯眼。現在是辦公大樓，圓頂內設有餐廳與活動空間。',
+  tips:['從易北河對岸或瑪麗恩橋上看最完整','圓頂內的餐廳或童話朗讀活動需另外預約，開放情況以官方公告為準','晚上打燈後很好拍']},
+ {id:'verkehr',ds:'Verkehrsmuseum',t:'museum',a:'老城',p:[8,6],e:'🚂',n:'德勒斯登交通博物館',de:'Verkehrsmuseum Dresden · Johanneum',s:'交通博物館',stay:'1.5–2 小時',go:'聖母教堂對面',
+  d:'位在新市集廣場上的 16 世紀文藝復興建築 Johanneum（原為王室馬廄），1956 年起成為交通博物館，展出火車、電車、汽車、船舶與航空，館藏超過 30 萬件，還有大型火車模型場景。2026 年 5 月到 2027 年 5 月有以「旅行」為主題的特展。',
+  tips:['成人約 €12，兒童免費','火車模型有定時運行示範','就在君王出巡圖旁邊，可以排在同一段']},
+ {id:'hygiene',ds:'Hygiene-Museum',t:'museum',a:'南側市區',p:[8,8],e:'🫀',n:'德國衛生博物館',de:'Deutsches Hygiene-Museum',s:'衛生博物館',stay:'1.5–2 小時',go:'老城搭電車約 10 分鐘，或從大花園步行',
+  d:'1912 年由漱口水品牌 Odol 的創辦人林格納（Karl August Lingner）創立，主題是「人」：從身體、飲食、性、記憶到死亡，展示方式生動有趣。招牌展品是可以看見骨骼、器官與血管的「玻璃人」（Gläserner Mensch）。',
+  tips:['有給兒童的感官體驗區，適合親子','特展常有社會議題，值得留時間','旁邊就是大花園，可以接著散步']},
+ {id:'schillergarten',ds:'Schillergarten',t:'food',a:'易北河東岸',p:[9,5],e:'🍻',n:'席勒花園啤酒花園',de:'Schillergarten Blasewitz',s:'席勒花園',stay:'1–1.5 小時',go:'藍色奇蹟橋南端',
+  d:'藍色奇蹟橋旁、緊鄰易北河的百年老店，名稱來自詩人席勒（Schiller）曾在附近居住。夏天的河畔啤酒花園是德勒斯登人週末最愛的去處之一，供應薩克森家常菜和在地啤酒。',
+  tips:['5–9 月天氣好時戶外座位最熱鬧','可以接著過橋搭纜車上山看夕陽','冬季以室內餐廳為主']},
+ {id:'elberadweg',ds:'Elberadweg',t:'nature',a:'易北河東岸',p:[8,4],e:'🚲',n:'易北河單車道',de:'Elberadweg · Elbwiesen',s:'易北河單車道',stay:'2–3 小時',go:'老城河岸出發',
+  d:'沿著易北河的長程單車道，是德國最受歡迎的單車路線之一。德勒斯登市區這段沿著大片河岸草地，從老城騎到藍色奇蹟橋、一路到皮爾尼茨宮都很平坦，是在地人最日常的週末活動。',
+  tips:['市區有共享單車可以租，也有單車出租店','老城 → 藍色奇蹟橋約 6 公里，→ 皮爾尼茨約 13 公里','夏天傍晚騎最舒服，記得避開河岸草地上的野餐人潮']},
+ {id:'pirna',ds:'Pirna',t:'town',a:'薩克森小瑞士',p:[11,7],e:'🏘️',n:'皮爾納老城',de:'Pirna · Altstadt & Marktplatz',s:'皮爾納',stay:'2–3 小時',go:'S-Bahn S1 約 20–25 分鐘',
+  d:'被稱為「薩克森小瑞士之門」的易北河小城，老城保存完整，畫家貝洛托（卡納萊托）18 世紀曾多次描繪這裡的市集廣場，現在還能找到畫中的視角。哥德式的聖母教堂（Marienkirche）與市政廳都在步行範圍內。',
+  tips:['可以和巴斯泰或國王岩排同一天，S1 順路','市集廣場旁有標示卡納萊托作畫的位置','12 月有小型聖誕市集，比德勒斯登清靜']},
+ {id:'schramm',ds:'Schrammsteine · Kirnitzschtal',t:'nature',a:'薩克森小瑞士',p:[14,8],e:'🧗',n:'施拉姆岩與基爾尼奇谷',de:'Schrammsteine · Kirnitzschtalbahn · Bad Schandau',s:'施拉姆岩',stay:'半天–一天',go:'S1 到 Bad Schandau 約 45–50 分鐘',
+  d:'Bad Schandau 附近的砂岩山脊，健行步道要爬鐵梯上到施拉姆岩觀景點，視野比巴斯泰更野、更開闊，是在地登山客的最愛。山下的基爾尼奇谷有 1898 年開通的百年電車，沿溪開到 Lichtenhainer Wasserfall 瀑布（瀑布每半小時「放水」一次）。',
+  tips:['施拉姆岩步道有鐵梯與陡坡，要穿好走的鞋、避開雨天','2026 年 7 月底暴風雨後基爾尼奇谷電車曾暫停營運，出發前請查 VVO／RVSOE 公告','從 Bad Schandau 車站搭渡輪過河到鎮上']},
+ {id:'freiberg',ds:'Freiberg',t:'town',a:'厄爾士山麓',p:[0,9],e:'⛏️',n:'弗萊貝格（銀礦之城）',de:'Freiberg · Altstadt & Dom St. Marien',s:'弗萊貝格',stay:'半天',go:'區域列車約 35 分鐘',
+  d:'靠銀礦致富的山城，老城保存完整。這裡有 1765 年創立、全世界最古老的礦業大學，城堡內的 terra mineralia 展出全球數一數二精彩的礦物收藏；大教堂有著名的「黃金門」雕刻與兩座 Silbermann 管風琴。',
+  tips:['terra mineralia 對材料、地科有興趣的人一定要去','大教堂的管風琴常有中午短演奏，時間以現場公告為準','12 月聖誕市集期間有礦工遊行（Bergparade）']},
  // 薩克森小瑞士
  {id:'bastei',ds:'Bastei',t:'nature',a:'薩克森小瑞士',p:[12,8],e:'⛰️',n:'巴斯泰橋',de:'Bastei · Basteibrücke',s:'巴斯泰橋',stay:'半天',go:'S1 到 Kurort Rathen 約 35–40 分鐘，再渡河步行 30–45 分鐘',
   d:'薩克森小瑞士國家公園最有名的砂岩奇景：1851 年建成、長 76.5 公尺的石橋橫跨約 40 公尺深的峽谷，連接嶙峋的砂岩柱。2023 年 2 月新的懸空觀景台啟用。',
@@ -631,7 +664,11 @@ const LINKS = [
  ['leipzig','voelker','tram'],['thomas','spinnerei','tram'],
  ['chemnitzhbf','marx','walk'],['marx','tietz','walk'],['marx','smac','walk'],['tietz','smac','walk'],['tietz','industrie','tram'],['chemnitzhbf','augustusburg','rail'],
  ['hbf','goerlitzhbf','rail'],['goerlitzhbf','goerlitz','walk'],['goerlitz','warenhaus','walk'],['goerlitz','peters','walk'],['peters','bruecke','walk'],['goerlitz','himmelreich','walk'],['goerlitz','rakotz','car'],
- ['hbf','tud','tram'],['tud','grossergarten','walk'],['kunsthof','infineon','tram'],['infineon','esmc','tram'],['infineon','mhm','tram']
+ ['hbf','tud','tram'],['tud','grossergarten','walk'],['kunsthof','infineon','tram'],['infineon','esmc','tram'],['infineon','mhm','tram'],
+ ['hofkirche','schloss','walk'],['hofkirche','semperoper','walk'],['kreuzkirche','altmarkt','walk'],['yenidze','zwinger','walk'],['verkehr','fuerstenzug','walk'],['verkehr','frauenkirche','walk'],
+ ['hygiene','grossergarten','walk'],['hygiene','hbf','tram'],['schillergarten','blaues','walk'],['schillergarten','toscana','walk'],
+ ['elberadweg','bruehl','bike'],['elberadweg','blaues','bike'],['blaues','pillnitz','bike'],['pillnitz','pirna','bike'],
+ ['pirna','bastei','sbahn'],['bastei','schramm','sbahn'],['koenigstein','schramm','sbahn'],['hbf','freiberg','rail'],['freiberg','chemnitzhbf','rail']
 ];
 
 const TOURS = [
@@ -714,6 +751,16 @@ const TOURS = [
    ['15:00','rakotz','開車往惡魔橋','往北開進盧薩蒂亞的森林，抵達克羅姆勞杜鵑花園。','🚗 開車約 1 小時'],
    ['16:15','rakotz','湖畔看圓形倒影','沿湖邊步道找不同角度，看橋與倒影合成一個圓。','🚶 停車場步行約 15 分鐘'],
    ['19:00','hbf','回到德勒斯登','開車回德勒斯登。','🚗 開車約 1.5 小時']
+  ]},
+ {k:'08',n:'在地人的德勒斯登（週六）',note:'這條路線排在週六，傍晚剛好趕上十字教堂 17:00 的晚禱。單車建議用共享單車或在老城租車；冬季可改搭電車、啤酒花園改去室內餐廳。',
+  steps:[
+   ['09:30','hofkirche','宮廷教堂','從王宮旁的大教堂開始，看屋頂 78 尊聖人像和 Silbermann 管風琴。'],
+   ['10:30','verkehr','交通博物館','穿過新市集廣場到 Johanneum，看火車、電車和火車模型。','🚶 步行 5 分鐘'],
+   ['12:30','elberadweg','租單車沿易北河騎','從布呂爾平台下的河岸出發，沿著河岸草地往東騎。','🚶 步行 5 分鐘'],
+   ['13:15','schillergarten','河畔啤酒花園午餐','騎到藍色奇蹟橋，在席勒花園吃午餐配在地啤酒。','🚲 單車約 25 分鐘'],
+   ['15:00','hygiene','衛生博物館','還車後搭電車到衛生博物館，看玻璃人。','🚋 電車約 20 分鐘'],
+   ['17:00','kreuzkirche','十字合唱團晚禱','到舊市集廣場的十字教堂，聽週六晚禱；散場後鐘樓有銅管演奏。','🚋 電車約 10 分鐘'],
+   ['18:30','yenidze','清真寺造型的菸草工廠','散步到 Yenidze 看夜間打燈，或預約圓頂內的晚餐。','🚶 步行約 15 分鐘']
   ]}
 ];
 
@@ -860,7 +907,7 @@ function buildMap(){
   // regions
   const gR=el('g',{class:'regions',id:'gRegions'},svg);
   // type: c = 城市／城鎮, d = 德勒斯登市區, l = 地區／地形
-  [[9.4,6.15,'Dresden','德勒斯登','c'],[1.2,0.15,'Meißen','邁森','c'],[3.1,2.0,'Radebeul','拉德博伊爾','c'],[4.5,-0.05,'Moritzburg','莫里茨堡','c'],
+  [[10.45,6.2,'Dresden','德勒斯登','c'],[1.2,0.15,'Meißen','邁森','c'],[3.1,2.0,'Radebeul','拉德博伊爾','c'],[4.5,-0.05,'Moritzburg','莫里茨堡','c'],
    [-5.3,-1.3,'Leipzig','萊比錫','c'],[-4.4,5.2,'Chemnitz','開姆尼茨','c'],[17.6,1.6,'Görlitz','格爾利茨','c'],
    [6.6,1.85,'Neustadt','新城','d'],[2.9,6.2,'Altstadt','老城','d'],[11.2,1.85,'Loschwitz','洛施維茨','d'],[13.6,6.3,'Pillnitz','皮爾尼茨','d'],[9.4,9.6,'Dresden-Süd','南側市區','d'],
    [13.9,7.6,'Sächsische Schweiz','薩克森小瑞士','l'],[-1.2,10.5,'Erzgebirge','厄爾士山','l'],[0.2,6.6,'Mittelsachsen','薩克森中部丘陵','l'],
@@ -1121,9 +1168,9 @@ $('#modal').addEventListener('click',e=>{ if(e.target.id==='modal') $('#modal').
 
 /* ============ EXTRA DATA ============ */
 let URBAN=[];
-const GEO={frauenkirche:[51.0519,13.7416],zwinger:[51.0530,13.7339],semperoper:[51.0543,13.7353],schloss:[51.0525,13.7370],fuerstenzug:[51.0527,13.7392],bruehl:[51.0533,13.7445],albertinum:[51.0510,13.7465],altmarkt:[51.0490,13.7383],kreutzkamm:[51.0485,13.7355],sophienkeller:[51.0517,13.7353],hbf:[51.0402,13.7320],canaletto:[51.0565,13.7420],reiter:[51.0573,13.7445],markthalle:[51.0613,13.7449],kunsthof:[51.0679,13.7543],pfunds:[51.0659,13.7578],mhm:[51.0789,13.7646],watzke:[51.0752,13.7124],blaues:[51.0526,13.8085],toscana:[51.0518,13.8075],schwebebahn:[51.0535,13.8150],elbschloesser:[51.0623,13.7898],pillnitz:[51.0088,13.8697],grossergarten:[51.0386,13.7631],glaeserne:[51.0435,13.7575],panometer:[51.0300,13.7880],radebeul:[51.1050,13.6700],wackerbarth:[51.1093,13.6273],meissen:[51.1661,13.4708],fummel:[51.1640,13.4730],moritzburg:[51.1680,13.6800],leipzighbf:[51.3455,12.3820],leipzig:[51.3405,12.3755],nikolai:[51.3403,12.3790],thomas:[51.3393,12.3725],auerbach:[51.3393,12.3760],voelker:[51.3123,12.4134],spinnerei:[51.3300,12.3190],chemnitzhbf:[50.8392,12.9300],marx:[50.8395,12.9220],tietz:[50.8335,12.9235],smac:[50.8296,12.9230],industrie:[50.8240,12.8970],augustusburg:[50.8128,13.1006],bastei:[50.9619,14.0736],koenigstein:[50.9192,14.0570],goerlitzhbf:[51.1460,14.9750],goerlitz:[51.1563,14.9907],peters:[51.1585,14.9925],bruecke:[51.1575,14.9945],warenhaus:[51.1513,14.9870],himmelreich:[51.1560,14.9890],rakotz:[51.4085,14.6372],tud:[51.0285,13.7270],esmc:[51.1240,13.7350],infineon:[51.1230,13.7770]};
-const FEE={frauenkirche:0,zwinger:14,semperoper:14,schloss:21,fuerstenzug:0,bruehl:0,albertinum:12,altmarkt:5,kreutzkamm:8,sophienkeller:25,canaletto:0,reiter:0,markthalle:10,kunsthof:0,pfunds:5,mhm:5,watzke:25,blaues:0,toscana:8,schwebebahn:7,elbschloesser:8,pillnitz:12,grossergarten:0,glaeserne:8,panometer:13,radebeul:10,wackerbarth:20,meissen:22,fummel:4,moritzburg:11,leipzig:0,nikolai:0,thomas:3,auerbach:30,voelker:10,spinnerei:0,marx:0,tietz:0,smac:8,industrie:8,augustusburg:15,bastei:3,koenigstein:16,goerlitz:3,peters:0,bruecke:0,warenhaus:0,himmelreich:20,rakotz:4,tud:0,esmc:0,infineon:0};
-const SEASON={altmarkt:{hi:[11,12],off:[1,2,3,4,5,6,7,8,9,10],note:'聖誕市集 11/25–12/24'},kreutzkamm:{hi:[11,12],note:'史多倫季'},pillnitz:{hi:[2,3,4],note:'百年山茶花開'},rakotz:{hi:[5,10],note:'5 月杜鵑花、10 月秋色'},radebeul:{hi:[9],note:'秋季葡萄酒節'},meissen:{hi:[9],note:'葡萄酒節'},wackerbarth:{hi:[9,10],note:'葡萄採收季'},canaletto:{hi:[6,7,8],note:'河岸露天電影'},moritzburg:{hi:[12,1,2],note:'冬季常有電影特展'},bastei:{hi:[5,6,9,10],note:'健行最舒服的季節'},goerlitz:{hi:[12],note:'西里西亞聖誕市集'},grossergarten:{hi:[4,5,6,7,8,9,10],note:'公園小火車營運季'}};
+const GEO={frauenkirche:[51.0519,13.7416],zwinger:[51.0530,13.7339],semperoper:[51.0543,13.7353],schloss:[51.0525,13.7370],fuerstenzug:[51.0527,13.7392],bruehl:[51.0533,13.7445],albertinum:[51.0510,13.7465],altmarkt:[51.0490,13.7383],kreutzkamm:[51.0485,13.7355],sophienkeller:[51.0517,13.7353],hbf:[51.0402,13.7320],canaletto:[51.0565,13.7420],reiter:[51.0573,13.7445],markthalle:[51.0613,13.7449],kunsthof:[51.0679,13.7543],pfunds:[51.0659,13.7578],mhm:[51.0789,13.7646],watzke:[51.0752,13.7124],blaues:[51.0526,13.8085],toscana:[51.0518,13.8075],schwebebahn:[51.0535,13.8150],elbschloesser:[51.0623,13.7898],pillnitz:[51.0088,13.8697],grossergarten:[51.0386,13.7631],glaeserne:[51.0435,13.7575],panometer:[51.0300,13.7880],radebeul:[51.1050,13.6700],wackerbarth:[51.1093,13.6273],meissen:[51.1661,13.4708],fummel:[51.1640,13.4730],moritzburg:[51.1680,13.6800],leipzighbf:[51.3455,12.3820],leipzig:[51.3405,12.3755],nikolai:[51.3403,12.3790],thomas:[51.3393,12.3725],auerbach:[51.3393,12.3760],voelker:[51.3123,12.4134],spinnerei:[51.3300,12.3190],chemnitzhbf:[50.8392,12.9300],marx:[50.8395,12.9220],tietz:[50.8335,12.9235],smac:[50.8296,12.9230],industrie:[50.8240,12.8970],augustusburg:[50.8128,13.1006],bastei:[50.9619,14.0736],koenigstein:[50.9192,14.0570],goerlitzhbf:[51.1460,14.9750],goerlitz:[51.1563,14.9907],peters:[51.1585,14.9925],bruecke:[51.1575,14.9945],warenhaus:[51.1513,14.9870],himmelreich:[51.1560,14.9890],rakotz:[51.4085,14.6372],tud:[51.0285,13.7270],esmc:[51.1240,13.7350],infineon:[51.1230,13.7770],hofkirche:[51.0536,13.7372],kreuzkirche:[51.0496,13.7404],yenidze:[51.0565,13.7247],verkehr:[51.0521,13.7395],hygiene:[51.0444,13.7485],schillergarten:[51.0525,13.8063],elberadweg:[51.0590,13.7650],pirna:[50.9620,13.9410],schramm:[50.9160,14.1700],freiberg:[50.9180,13.3420]};
+const FEE={frauenkirche:0,zwinger:14,semperoper:14,schloss:21,fuerstenzug:0,bruehl:0,albertinum:12,altmarkt:5,kreutzkamm:8,sophienkeller:25,canaletto:0,reiter:0,markthalle:10,kunsthof:0,pfunds:5,mhm:5,watzke:25,blaues:0,toscana:8,schwebebahn:7,elbschloesser:8,pillnitz:12,grossergarten:0,glaeserne:8,panometer:13,radebeul:10,wackerbarth:20,meissen:22,fummel:4,moritzburg:11,leipzig:0,nikolai:0,thomas:3,auerbach:30,voelker:10,spinnerei:0,marx:0,tietz:0,smac:8,industrie:8,augustusburg:15,bastei:3,koenigstein:16,goerlitz:3,peters:0,bruecke:0,warenhaus:0,himmelreich:20,rakotz:4,tud:0,esmc:0,infineon:0,hofkirche:0,kreuzkirche:5,yenidze:0,verkehr:12,hygiene:12,schillergarten:20,elberadweg:15,pirna:0,schramm:8,freiberg:12};
+const SEASON={altmarkt:{hi:[11,12],off:[1,2,3,4,5,6,7,8,9,10],note:'聖誕市集 11/25–12/24'},kreutzkamm:{hi:[11,12],note:'史多倫季'},pillnitz:{hi:[2,3,4],note:'百年山茶花開'},rakotz:{hi:[5,10],note:'5 月杜鵑花、10 月秋色'},radebeul:{hi:[9],note:'秋季葡萄酒節'},meissen:{hi:[9],note:'葡萄酒節'},wackerbarth:{hi:[9,10],note:'葡萄採收季'},canaletto:{hi:[6,7,8],note:'河岸露天電影'},moritzburg:{hi:[12,1,2],note:'冬季常有電影特展'},bastei:{hi:[5,6,9,10],note:'健行最舒服的季節'},goerlitz:{hi:[12],note:'西里西亞聖誕市集'},grossergarten:{hi:[4,5,6,7,8,9,10],note:'公園小火車營運季'},kreuzkirche:{hi:[12],note:'聖誕晚禱與音樂會'},schillergarten:{hi:[5,6,7,8,9],note:'河畔啤酒花園季'},elberadweg:{hi:[5,6,7,8,9],note:'騎車最舒服的季節'},schramm:{hi:[5,6,9,10],note:'健行好季節'},freiberg:{hi:[12],note:'聖誕市集與礦工遊行'},pirna:{hi:[12],note:'小型聖誕市集'}};
 const SUN={1:[8.15,16.45],2:[7.4,17.35],3:[6.45,18.2],4:[6.35,20.05],5:[5.4,20.85],6:[4.9,21.45],7:[5.15,21.4],8:[5.95,20.75],9:[6.8,19.6],10:[7.6,18.5],11:[7.4,16.6],12:[8.1,15.95]};
 const fmtH=h=>{ h=((h%24)+24)%24; let H=Math.floor(h), M=Math.round((h-H)*60); if(M===60){H++;M=0;} return String(H%24).padStart(2,'0')+':'+String(M).padStart(2,'0'); };
 const fmtMin=m=>{ m=Math.round(m); if(m<60) return m+' 分'; const h=Math.floor(m/60), r=m%60; return h+' 小時'+(r?' '+r+' 分':''); };
